@@ -32,6 +32,54 @@ MuJoCo で回すときは `--features sim`（`MUJOCO_DYNAMIC_LINK_DIR` が要る
 misa-runner の README「sim」）。サブコマンド・フラグ・環境変数はすべて
 misa-runner のもの。
 
+## MuJoCo でリアルタイムに操縦する（MPC + WBC）
+
+実機に触れずに、MPC 歩容 + 全身制御の構成をキーボードで動かして articara で
+見る。**`--pilot keys` か `--viz` を付けると sim は実時間で流れる**（付けないと
+全力で回って 10 秒ぶんが 1 秒で終わる）。
+
+```sh
+# 1) ビルド（MuJoCo の共有ライブラリが要る）
+export MUJOCO_DYNAMIC_LINK_DIR=$HOME/.mujoco/mujoco-3.8.0/lib
+export LD_LIBRARY_PATH=$MUJOCO_DYNAMIC_LINK_DIR
+cargo build --release --features sim
+
+# 2) MuJoCo（キーボード操縦 + articara へ配信。Ctrl-C まで）
+./target/release/namiashi-run sim --robot robots/namiashi_mpc_wbc.toml \
+    --pilot keys --secs 0 --viz --viz-endpoint tcp/127.0.0.1:7447
+
+# 3) 別端末で articara を起動し、同じモデルを開く
+cd ../articara && cargo run --release --features viz -- \
+    --model ../namiashi-runner2/models/namiashi/namiashi.misa
+#    「Live gait feed」パネルでエンドポイント tcp/127.0.0.1:7447 を入れて Start
+```
+
+`robots/namiashi_mpc_wbc.toml` は `robots/namiashi.toml`（配線・校正値は同じ）に
+articara が詰めた歩容の値（歩幅 0.145、周期 trot 0.320 / walk 0.500 / crawl
+0.800、遊脚 0.04）、`controller = "mpc"`、`[wbc] enabled = true`、
+`output = "position"`、`torque_scale = 1.6667` を足したもの。トルク出力を試す
+なら `--wbc-output torque`。
+
+キー（押すたびに 1 段。**離しても止まらない**ので止めるのはスペース）:
+
+| キー | |
+|---|---|
+| `0` / `1` / `2` | 脱力 / 初期姿勢（立つ） / 歩行 |
+| `z` / `x` / `c` | 歩容 Crawl / Walk / Trot |
+| `w` `s` | 前進 / 後退を 1 段ずつ |
+| `a` `d` | 左右真横 |
+| `q` `e` | 左右旋回 |
+| スペース | 速度 0 |
+| `r` `f` | 胴体を高く / 低く |
+| `i` `k` `j` `l` / `v` | 胴体の傾き（ピッチ・ロール） / 水平に戻す |
+| `t` `g` / `y` `b` / `u` `n` | 歩容の周期 / 遊脚高さ / 歩幅を歩きながら ± |
+
+順序は `1`（立つ）→ `c`（Trot）→ `2`（歩行）→ `w` を数回。articara が無くても
+`--viz` を外せば動く（端末の状態行だけ）。動画にするなら `--features render`
+と `--video DIR`（misa-runner README「sim」）。
+
+**端末を raw モードにする**ので、落ちてエコーが戻らなかったら `reset`。
+
 ## この機体の事実（制御の前提）
 
 ### モータ: LKMTech MG4005E-i10

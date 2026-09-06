@@ -1,0 +1,324 @@
+# namiashi — MPC 歩容 + 全身制御（WBC）で回す構成。
+#
+# robots/namiashi.toml（配線・校正値は同じ）に、articara が namiashi で詰めた歩容の
+# 値と MPC・WBC を足したもの。**MuJoCo で検証した構成**（misa-runner README
+# 「評価の仕方」、この README「WBC / MPC の評価」）。実機で使うときは
+# doc/bringup_checklist.md の順に、まず --wbc 無しの robots/namiashi.toml で。
+#
+#   namiashi-run sim --robot robots/namiashi_mpc_wbc.toml --pilot keys --realtime \
+#       --secs 0 --viz --viz-endpoint tcp/127.0.0.1:7447
+#
+name = "namiashi"
+
+[control]
+model = "models/namiashi/namiashi.misa"
+rate_hz = 200.0
+transition_s = 1.5
+start_pose = "start"
+
+# 電源投入後の初回起動で、いまの姿勢をマルチターン原点に張り直す。
+#
+# **起動時にロボットが伏せ姿勢であることが前提。** 立脚中に効くと
+# zero_pose_rad 12 軸が全部無効になるので、電源投入後の 1 回だけに
+# 限ってある（目印は /dev/shm、再起動で消える）。試合中にサービスが
+# 再起動しても張り直さない。
+zero_multiturn_on_boot = true
+kinematics_pose = "extend"
+teleop_timeout_ms = 100
+
+[gait]
+stance_height_m = 0.2
+swing_height_m = 0.04
+max_vx_m_s = 1.0
+max_vy_m_s = 0.08
+max_wz_rad_s = 0.6
+height_range_m = 0.04
+crawl_use_linear = false
+# ── MPC + WBC 用の詰め値（articara の namiashi 検証と同じ。misa-runner README）──
+controller = "mpc"
+step_length_m = 0.145
+trot_cycle_s = 0.320
+walk_cycle_s = 0.500
+crawl_cycle_s = 0.800
+mpc_capture_point_gain_s = 0.0
+velocity_ramp_s = 0.5
+velocity_ramp_stop_s = 0.15
+stop_settle_s = 0.25
+# body_attitude_max_rad = 0.0
+body_attitude_max_rad = 0.60
+body_attitude_tau_s = 0.15
+
+[teleop.vx]
+channel = 2
+raw_min = 172
+raw_center = 992
+raw_max = 1811
+reverse = false
+deadband = 0.06
+expo = 0.0
+
+[teleop.vy]
+channel = 1
+raw_min = 172
+raw_center = 992
+raw_max = 1811
+reverse = false
+deadband = 0.06
+expo = 0.0
+
+[teleop.wz]
+channel = 4
+raw_min = 172
+raw_center = 992
+raw_max = 1811
+reverse = false
+deadband = 0.06
+expo = 0.0
+
+[teleop.height]
+channel = 3
+raw_min = 172
+raw_center = 992
+raw_max = 1811
+reverse = false
+deadband = 0.06
+expo = 0.0
+
+[teleop.mode]
+channel = 5
+thresholds = [
+    582,
+    1401,
+]
+
+[teleop.gait]
+channel = 6
+thresholds = [
+    582,
+    1401,
+]
+
+[teleop.pose]
+channel = 9
+thresholds = [992]
+
+[teleop.chicken_head]
+channel = 8
+thresholds = [992]
+
+[teleop.pose_select]
+channel = 10
+thresholds = [992]
+
+[teleop.arm]
+channel = 7
+raw_min = 172
+raw_center = 992
+raw_max = 1811
+reverse = false
+deadband = 0.0
+expo = 0.0
+
+[poses]
+greeting = "wave_fr"
+greeting_alt = "wave_fl"
+chicken_head_base_rad = 0.0
+chicken_head_gain = 1.0
+chicken_head_tau_s = 0.05
+
+[hardware]
+# 実機との繋ぎ方。**サブテーブルより前に置くこと**（TOML では見出しより
+# 後ろの素のキーは、そのテーブルの中身として読まれる）。
+kind = "serial"
+
+[hardware.legs]
+baud = 2000000
+response_timeout_ms = 20
+bus_rate_hz = 500.0
+gear_ratio = 10.0
+
+default_max_speed_rad_s = 8.0
+# **3.0 では歩容に当たっていた。** 2026-09-02 に安全ゲートを実機の指令へ
+# 配線したので、そのままだと歩容を鈍らせることになる。**実機の挙動を変え
+# たくないので、歩容ではなく上限を上げた**（要求は trot が calf 3.88、
+# walk が 5.21 rad/s。`dump` が毎回突き合わせる）。
+#
+# 目標が跳んだとき（1 周期で 1 rad なら 200 rad/s）は変わらず捕まる。
+# モデルの定格は 33.5 rad/s なので、効くのはこちらの 6.0。
+max_target_rate_rad_s = 6.0
+status_interval_ms = 1000
+
+[[hardware.legs.bus]]
+leg = "FL"
+
+[hardware.legs.bus.port]
+uart = 0
+
+[[hardware.legs.bus.motors]]
+kind = "hip"
+id = 1
+sign = 1.0
+zero_pose_rad = 0.5795119456780721
+min_rad = -1.0471975511965976
+max_rad = 0.7853981633974483
+
+[[hardware.legs.bus.motors]]
+kind = "thigh"
+id = 2
+sign = 1.0
+zero_pose_rad = 1.1938705988362008
+min_rad = -2.530727415391778
+max_rad = 2.530727415391778
+
+[[hardware.legs.bus.motors]]
+kind = "calf"
+id = 3
+sign = 1.0
+zero_pose_rad = -2.6969417523103556
+min_rad = -2.6969417523103556
+max_rad = 2.6969417523103556
+gear_ratio = 15.555555555555555
+
+[[hardware.legs.bus]]
+leg = "FR"
+
+[hardware.legs.bus.port]
+uart = 2
+
+[[hardware.legs.bus.motors]]
+kind = "hip"
+id = 1
+sign = 1.0
+zero_pose_rad = -0.5953119456780721
+min_rad = -0.7853981633974483
+max_rad = 1.0471975511965976
+
+[[hardware.legs.bus.motors]]
+kind = "thigh"
+id = 2
+sign = -1.0
+zero_pose_rad = 1.192870598836201
+min_rad = -2.530727415391778
+max_rad = 2.530727415391778
+
+[[hardware.legs.bus.motors]]
+kind = "calf"
+id = 3
+sign = -1.0
+zero_pose_rad = -2.6969417523103556
+min_rad = -2.6969417523103556
+max_rad = 2.6969417523103556
+gear_ratio = 15.555555555555555
+
+[[hardware.legs.bus]]
+leg = "RL"
+
+[hardware.legs.bus.port]
+uart = 1
+
+[[hardware.legs.bus.motors]]
+kind = "hip"
+id = 1
+sign = -1.0
+zero_pose_rad = 0.5548619456780721
+min_rad = -1.0471975511965976
+max_rad = 0.7853981633974483
+
+[[hardware.legs.bus.motors]]
+kind = "thigh"
+id = 2
+sign = 1.0
+zero_pose_rad = 1.1308669256310975
+min_rad = -2.530727415391778
+max_rad = 2.530727415391778
+
+[[hardware.legs.bus.motors]]
+kind = "calf"
+id = 3
+sign = 1.0
+zero_pose_rad = -2.6969417523103556
+min_rad = -2.6969417523103556
+max_rad = 2.6969417523103556
+gear_ratio = 15.555555555555555
+
+[[hardware.legs.bus]]
+leg = "RR"
+
+[hardware.legs.bus.port]
+uart = 3
+
+[[hardware.legs.bus.motors]]
+kind = "hip"
+id = 1
+sign = -1.0
+zero_pose_rad = -0.5555119456780719
+min_rad = -0.7853981633974483
+max_rad = 1.0471975511965976
+
+[[hardware.legs.bus.motors]]
+kind = "thigh"
+id = 2
+sign = -1.0
+zero_pose_rad = 1.1154669256310974
+min_rad = -2.530727415391778
+max_rad = 2.530727415391778
+
+[[hardware.legs.bus.motors]]
+kind = "calf"
+id = 3
+sign = -1.0
+zero_pose_rad = -2.6969417523103556
+min_rad = -2.6969417523103556
+max_rad = 2.6969417523103556
+gear_ratio = 15.555555555555555
+
+[hardware.imu]
+baud = 921600
+response_timeout_ms = 50
+mount_offset_rad = [
+    0.0,
+    0.0,
+    0.0,
+]
+
+[hardware.imu.port]
+uart = 5
+
+[hardware.sbus]
+stale_after_ms = 100
+
+[hardware.sbus.port]
+uart = 6
+
+[hardware.arm]
+protocol = "receiver_direct"
+baud = 115200
+id = 1
+sign = 1.0
+zero_pose_rad = 0.0
+min_rad = -2.3
+max_rad = 0.85
+
+[hardware.arm.port]
+uart = 4
+
+[wbc]
+# 全身制御。既定は無効（歩容の IK 出力をそのまま位置制御で流す）。
+# 有効にするときは README「WBC（全身制御）」を読むこと。
+enabled = true
+# 位置出力: 位置 PD が歩容を追い、WBC の τ を前置で足す（実機は torque_constant_nm_per_a
+# を書くまでトルク出力が使えないので、実機でも使えるのはこちら）。sim で
+# トルク出力を試すなら --wbc-output torque。
+output = "position"
+# モデルの effort（連続定格。MG4005E-i10 の 1.5 N·m）に掛ける係数。
+# **LKMTech MG4005 の 24 V での瞬時最大トルクは 2.5 N·m**（減速機出力）
+# なので 2.5 / 1.5 = 1.667。calf は外側にさらに 1.556 の減速があり、
+# 瞬時 3.89 N·m のところを 2.205 × 1.667 = 3.68 で使う（少し控えめ）。
+#
+# 2.5 N·m は **24 V での値**。バッテリは 19.8 V と 25.6 V の 2 種があり、
+# 25.6 V ならこの値が使える。**19.8 V では理屈どおり電圧比で下げる**:
+# 1.6667 × 19.8 / 24 = 1.375（まずはこれで。実測で詰める）。
+# 電流はベンチ電源の 5 A 制限がテスト用で、電源は最大 30 A、本番バッテリは
+# 25 A まで流せる。5 A で試すときだけ max_torque_nm で頭打ちにする。
+torque_scale = 1.6667
+# torque_scale = 1.375   # 19.8 V バッテリのとき
