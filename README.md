@@ -80,6 +80,24 @@ articara が詰めた歩容の値（歩幅 0.145、周期 trot 0.320 / walk 0.50
 
 **端末を raw モードにする**ので、落ちてエコーが戻らなかったら `reset`。
 
+### 動画にする（オフスクリーン描画）
+
+GUI 無しで MuJoCo を EGL で描いて PNG に落とし、ffmpeg でまとめる
+（`--features render`。misa-runner README「sim」）。胴体高さの変更を検証した
+ときの撮り方:
+
+```sh
+cargo build --release --features sim,render
+./target/release/namiashi-run sim --robot robots/namiashi_mpc_wbc.toml \
+    --gait trot --vx 0.3 --secs 15 --height-script "3:-0.04,6:0.03,9:0" \
+    --video /tmp/nm --cam-az 100 --cam-el -12 --cam-dist 1.1
+ffmpeg -framerate 30 -i /tmp/nm/frame_%05d.png \
+    -vf "eq=brightness=0.28:contrast=1.5" -c:v libx264 -pix_fmt yuv420p videos/height.mp4
+```
+
+`--height-script` は「歩容が始まってからの秒 : 立ち高さからの差 [m]」
+（misa-runner 6b5c667 以降）。`videos/` は追跡しない。
+
 ## この機体の事実（制御の前提）
 
 ### モータ: LKMTech MG4005E-i10

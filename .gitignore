@@ -3,3 +3,5 @@
 **/*.rs.bk
 # 人ごと・マシンごとに違う（scripts/dev-siblings.sh が書く）。
 /.cargo/config.toml
+# 動画は大きいので追跡しない（作り方は README「MuJoCo でリアルタイムに操縦する」）。
+/videos
