@@ -23,7 +23,7 @@ for d in "$ROOT/misa-runner" "$ROOT/namiashi-runner"; do
   if [ -f "$d/crates/misa-runner/Cargo.toml" ]; then
     mkdir -p .cargo
     cat > "$CONFIG" <<EOT
-[patch."ssh://git@github.com/takarakasai/misa-runner.git"]
+[patch."https://github.com/takarakasai/misa-runner.git"]
 misa-runner = { path = "$d/crates/misa-runner" }
 EOT
     echo "$CONFIG を書きました → $d"; exit 0
