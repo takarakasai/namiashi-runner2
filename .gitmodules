@@ -1,0 +1,3 @@
+[submodule "models/namiashi"]
+	path = models/namiashi
+	url = https://github.com/takarakasai/namiashi_description.git

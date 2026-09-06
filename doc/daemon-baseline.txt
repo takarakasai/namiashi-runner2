@@ -1,0 +1,51 @@
+# 2026-08-21 常駐デーモン棚卸し 完了後の確定状態（再起動・検証済み）
+# 差分が出たら doc/runtime_tuning.md 調査3 と突き合わせる
+
+## running services (13)
+dbus.service
+getty@tty1.service
+irqbalance.service
+NetworkManager.service
+serial-getty@ttyAS0.service
+ssh.service
+systemd-journald.service
+systemd-logind.service
+systemd-resolved.service
+systemd-timesyncd.service
+systemd-udevd.service
+user@1002.service
+wpa_supplicant.service
+
+## timers (2)
+fstrim.service
+systemd-tmpfiles-clean.service
+
+## masked
+alsa-restore.service
+alsa-state.service
+alsa-utils.service
+cryptdisks-early.service
+cryptdisks.service
+hwclock.service
+packagekit.service
+plymouth-quit.service
+plymouth-quit-wait.service
+plymouth-read-write.service
+plymouth-start.service
+pulseaudio-enable-autospawn.service
+rc.service
+rcS.service
+rtkit-daemon.service
+samba-ad-dc.service
+sudo.service
+systemd-rfkill.service
+systemd-rfkill.socket
+x11-common.service
+
+## initrd
+7015212 bytes  /boot/initrd.img-5.15.147-21-a733
+entries: 208
+
+## boot
+Startup finished in 1.494s (kernel) + 1.994s (userspace) = 3.489s 
+multi-user.target reached after 1.972s in userspace

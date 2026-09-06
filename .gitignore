@@ -1,0 +1,5 @@
+/target
+**/target/
+**/*.rs.bk
+# 人ごと・マシンごとに違う（scripts/dev-siblings.sh が書く）。
+/.cargo/config.toml

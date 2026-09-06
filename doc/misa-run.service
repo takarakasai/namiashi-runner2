@@ -1,0 +1,133 @@
+# misa-run 制御ループの systemd ユニット
+#
+# インストール:
+#   sudo cp ~/work/misa-runner/doc/misa-run.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl start misa-run        # 手動起動で試す
+#   journalctl -u misa-run -f            # ログを見る
+#
+# 電源投入で自動起動させるのは、手動起動で挙動を確認してから:
+#   sudo systemctl enable misa-run
+#
+# 停止は必ず systemctl で（SIGTERM が脱力シーケンスに入る）:
+#   sudo systemctl stop misa-run
+#
+# 設計の根拠は doc/runtime_tuning.md 「RT 優先度の付与」を参照。
+#
+# --- 本番の投入手順（順番が重要） ---
+#   1. ロボットを**伏せ姿勢**にして置く。
+#      config の zero_multiturn_on_boot = true により、電源投入後の初回起動で
+#      **そのときの姿勢がマルチターン原点になる**（制御ループ開始の直前、
+#      CH5 が脱力だと確認できた時点）。伏せ以外の姿勢で起動させると
+#      12 軸の zero_pose_rad が全て無効になる。
+#
+#      この張り直しは電源投入につき 1 回だけ。目印を /dev/shm に置いており、
+#      再起動で消える。試合中にサービスが再起動しても、そこでは張り直さない
+#      （立脚中に張り直したら壊滅するため）。
+#
+#      なぜ電源投入だけに頼らないのか: SBC はモータと同じ電源から作っている
+#      ので、電源が入る瞬間は SBC のブート中で、操縦者がまだロボットを置いて
+#      いる最中かもしれない。原点が決まる瞬間を人が狙えない。張り直しは
+#      その瞬間を「脱力が確認できている起動直前」に移すためのもの。
+#
+#      **電源系統を分けたら、この一度きりの判定（/dev/shm が再起動で消える
+#      ことに依存）は前提が崩れる。** そのときは作り直すこと。
+#   2. プロポの電源を入れ、CH5 を**脱力**位置にする。
+#   3. SBC の電源を入れる（enable 済みなら自動起動）。
+#      **本番会場では PC を繋げないので enable は必須。**
+#      2 が済んでいなくても、済ませた時点で自動的に立ち上がる（下記 Restart= 参照）。
+#   4. ベンチなら `journalctl -u misa-run -f` で
+#      「マルチターン原点を張り直しました」と
+#      「マルチターン原点は伏せ姿勢と整合しています」を確認してから CH5 を動かす。
+#      本番会場では PC を繋げないので、ここは 1 の姿勢を守ることで担保する。
+
+[Unit]
+Description=misa-run quadruped control loop (robot: namiashi)
+Documentation=file:///home/takara/work/misa-runner/doc/runtime_tuning.md
+
+# CH348 の tty が生えてから起動する。ch9344 は USB 接続時に udev がロードする。
+# BindsTo により、USB を抜くとサービスも停止する。
+After=dev-ttyCH9344USB0.device
+BindsTo=dev-ttyCH9344USB0.device
+
+# ネットワークには依存しない。本番の操縦は S.BUS(UART6) 経由のプロポ。
+After=basic.target
+
+# 起動レート制限は無効にする。
+#
+# 制限を残すと、プロポの電源を入れるのが 5 回×3 秒 = 15 秒より遅れただけで
+# ユニットが failed のまま固まる。**会場では PC を繋げないので、そうなったら
+# 電源を入れ直すしか手が無い。** 起動条件が整うまで何分でも待てる方がよい。
+#
+# 再起動が暴走しても実害が無いのは、`run` が CH5 脱力位置でなければ起動を
+# 拒否するため。ロボットは操縦者が CH5 を操作するまで何もしない。
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=takara
+SupplementaryGroups=dialout
+WorkingDirectory=/home/takara/work/misa-runner
+ExecStart=/home/takara/work/misa-runner/target/release/misa-run run --robot robots/namiashi.toml
+
+# --- リアルタイム優先度 ---
+# systemd が付与するので、アプリ側に CAP_SYS_NICE も rtprio 制限も不要。
+# プロセスの全スレッド（制御ループ / leg-FL..RR / imu / sbus）が SCHED_FIFO になる。
+#
+# 50 は handover.md §5.5 の `chrt -f 50` に合わせた値。
+# これ以上上げるのは推奨しない（ksoftirqd 餓死のリスク）。
+CPUSchedulingPolicy=fifo
+CPUSchedulingPriority=50
+
+LimitRTPRIO=95
+LimitMEMLOCK=infinity
+
+# 脚バスの二重掴みは /run/lock/misa-legs-namiashi.lock の flock で防いでいる
+# （misa-hal の LegsLock）。**PrivateTmp= や PrivateDevices=、
+# ProtectSystem=strict をここに足すと、その名前空間が分かれて排他が黙って
+# 効かなくなる。** 足すなら BindPaths= で /run/lock を共有すること。
+#
+# 二重に走ると RS485 の応答が取り違えられ、通信エラーにならないまま
+# 関節角だけが壊れる。サービス化の初日に実際に起きた（18:10:51 に 2 プロセス）。
+
+# --- 自動再起動: どの失敗でも再試行する ---
+#
+# 当初は「起動条件待ち（終了コード 75）だけ再起動し、クラッシュでは再起動
+# しない」設計にしていた。自動再起動で**脚が再び動き出す**のを避けるためだが、
+# **本番会場では PC を繋げない**という条件でこれを見直した。
+#
+# 再起動しても脚が勝手に動くことはない。`run` は起動時に **CH5 が脱力位置に
+# ないと起動を拒否する**（拒否は 75 で、また再試行される）。つまり再起動後の
+# ロボットは、操縦者が CH5 を脱力に戻すまで何もしない。動き出すには操縦者が
+# 明示的に CH5 を操作する必要があり、これが人による確認そのものになっている。
+#
+# この前提が付くと、両者の損得が逆転する:
+#   再起動する  … 試合中に落ちても、CH5 を脱力に戻せば復帰する。PC は要らない。
+#   再起動しない… 落ちた時点でロボットが死ぬ。復帰手段は電源の入れ直しだけで、
+#                  しかも伏せ姿勢に直さないとマルチターン原点が壊れる。
+#
+# 会場で取れる手段が電源とプロポしかない以上、前者を選ぶ。
+# 暴走の心配は CH5 の門で頭打ちになる（StartLimitIntervalSec=0 の項も参照）。
+#
+# なお runner 側の 75 / 1 の返し分けはログの区別（「待機:」対「エラー:」）として
+# 残してある。詳細は crates/misa-runner/src/runner.rs の RETRYABLE を参照。
+Restart=on-failure
+RestartSec=3
+
+# SIGTERM は脱力シーケンスに入る（runner.rs の SHUTDOWN フラグ）。
+# 実測の終了時間は約 3.2 秒なので 15 秒あれば足りる。
+# 落ちなければ SIGKILL になり、モータは最後の指令を保持したままになる。
+KillSignal=SIGTERM
+TimeoutStopSec=15
+
+[Install]
+# 注意: これは「電源投入 → S.BUS 応答」を 1.6 秒遅らせる設定である。
+#
+# CH348 の tty は 3.398 s、multi-user.target は 3.489 s なので、現状の差は
+# 91 ms しかない。しかし ch9344 を先読みして tty を 1.84 s に前倒しすると、
+# 律速がこの行に移る。misa-run はネットワークにもログインセッションにも
+# 依存しないので、multi-user.target を待つ理由は本来無い。
+#
+# 詳細と測定値: doc/boot_config.md「CH348 の tty 生成が 1.764 秒待たされている」
+# サービス投入時に ch9344 の先読みとセットで見直すこと。
+WantedBy=multi-user.target

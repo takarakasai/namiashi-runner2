@@ -1,0 +1,42 @@
+# namiashi-runner2 — namiashi（LKMTech MG4005 ×12、シリアル直結）の機体固有部分。
+#
+# **汎用の制御は misa-runner にある。** ここに置くのは、この機体にしか無い
+# ものだけ:
+#
+#   robots/namiashi.toml   プロファイル（配線・モータ id・校正値・WBC のトルク上限）
+#   models/namiashi        モデル（.misa とメッシュ）
+#   doc/ scripts/          この機体と SBC（radxa-cubie-a7z）の立ち上げ・運用手順
+#   src/main.rs            misa_runner を呼ぶだけ（シリアル直結の Plant は
+#                          misa-runner の組み込みなので Backend を差す必要が無い）
+#
+# **旧 namiashi-runner（github.com/takarakasai/namiashi-runner）は過去の大会の
+# 環境再現のために残してある。** 新しい変更はこちらと misa-runner に入れる。
+[package]
+name = "namiashi-runner2"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+authors = ["Takara Kasai <takara.kasai@gmail.com>"]
+publish = false
+
+[[bin]]
+name = "namiashi-run"
+path = "src/main.rs"
+
+[dependencies]
+# **misa-runner は git 依存。** `git clone && cargo build` だけで立ち上がる
+# （隣に misa-runner のチェックアウトを置く必要はない）。
+#
+# **scp 形式（`git@github.com:takarakasai/...`）は cargo が受け付けない。**
+# スキーム付きの URL に直す。認証は同じ SSH 鍵。
+#
+# **`branch` を明示している。** misa-runner.git に push されているのがいまは
+# このブランチだけ。main を push したら `branch` を外すか `tag` / `rev` に替える。
+misa-runner = { git = "ssh://git@github.com/takarakasai/misa-runner.git", branch = "namiashi2027" }
+
+[features]
+default = ["viz"]
+# misa-runner 側の feature をそのまま通す。
+viz = ["misa-runner/viz"]
+sim = ["misa-runner/sim"]
+render = ["misa-runner/render"]
