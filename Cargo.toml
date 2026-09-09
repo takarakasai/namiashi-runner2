@@ -29,9 +29,9 @@ path = "src/main.rs"
 # リポジトリなので https で取る — SBC に SSH 鍵も認証情報も要らない
 # （ssh:// だと cargo の libgit2 が ssh-agent 認証に失敗する環境がある）。
 #
-# **`branch` を明示している。** 使っているのはこのブランチ。main に統合したら
-# `branch` を外すか `tag` / `rev` に替える。
-misa-runner = { git = "https://github.com/takarakasai/misa-runner.git", branch = "namiashi2027" }
+# ブランチは指定しない（既定ブランチ = main）。namiashi2027 は main に統合済みで、
+# push 先は main になっている（2026-09-10）。
+misa-runner = { git = "https://github.com/takarakasai/misa-runner.git" }
 
 [dev-dependencies]
 # tests/model_consistency.rs（.misa と URDF サイドカーの整合）が TOML を読む。

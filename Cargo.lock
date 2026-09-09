@@ -2046,7 +2046,7 @@ dependencies = [
 [[package]]
 name = "misa-core"
 version = "0.1.0"
-source = "git+https://github.com/takarakasai/misa-runner.git?branch=namiashi2027#e503c777ce332e50090cae9784b650dbca35352d"
+source = "git+https://github.com/takarakasai/misa-runner.git#fcd6b6c250f1b72f825764e9c3541fa43dd992f4"
 dependencies = [
  "serde",
 ]
@@ -2054,7 +2054,7 @@ dependencies = [
 [[package]]
 name = "misa-hal"
 version = "0.1.0"
-source = "git+https://github.com/takarakasai/misa-runner.git?branch=namiashi2027#e503c777ce332e50090cae9784b650dbca35352d"
+source = "git+https://github.com/takarakasai/misa-runner.git#fcd6b6c250f1b72f825764e9c3541fa43dd992f4"
 dependencies = [
  "libc",
  "lkmotor-driver",
@@ -2072,7 +2072,7 @@ dependencies = [
 [[package]]
 name = "misa-plant-mujoco"
 version = "0.1.0"
-source = "git+https://github.com/takarakasai/misa-runner.git?branch=namiashi2027#e503c777ce332e50090cae9784b650dbca35352d"
+source = "git+https://github.com/takarakasai/misa-runner.git#fcd6b6c250f1b72f825764e9c3541fa43dd992f4"
 dependencies = [
  "articara",
  "log",
@@ -2084,7 +2084,7 @@ dependencies = [
 [[package]]
 name = "misa-runner"
 version = "0.1.0"
-source = "git+https://github.com/takarakasai/misa-runner.git?branch=namiashi2027#e503c777ce332e50090cae9784b650dbca35352d"
+source = "git+https://github.com/takarakasai/misa-runner.git#fcd6b6c250f1b72f825764e9c3541fa43dd992f4"
 dependencies = [
  "env_logger",
  "legged-estimation",
