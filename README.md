@@ -124,6 +124,40 @@ ffmpeg -framerate 30 -i /tmp/nm/frame_%05d.png \
 `--height-script` は「歩容が始まってからの秒 : 立ち高さからの差 [m]」
 （misa-runner 6b5c667 以降）。`videos/` は追跡しない。
 
+**歩いているところを撮るなら `--cam-fixed`**（床が無地なので、追従カメラだと
+足だけ動いて機体は止まって見える）。`--cam-az 90` で右が前、`--cam-x` は
+カメラが見る点の前後位置で、進む距離の半分に置く。
+
+### 制御モードごとの歩行動画（2026-09-10）
+
+同じ機体・同じ指令（walk 0.20 m/s、歩容 11 s、misa-runner fcd6b6c）で制御モード
+だけ変えたもの。`videos/modes_walk020_v*.mp4`、4 本を並べたのが
+`videos/modes_walk020_grid.mp4`（追跡しない）。
+
+| # | モード | プロファイル / フラグ | 前後 [m] | 左右 [m] | ヨー |
+|---|---|---|---|---|---|
+| 1 | CHAMP、WBC 無し（位置サーボ） | `robots/namiashi.toml` | +2.03 | +0.31 | +10.9° |
+| 2 | MPC、WBC 無し | 1 と 1 ビットも違わない（接地力を誰も使わない） | +2.03 | +0.31 | +10.9° |
+| 3 | CHAMP + WBC 位置出力 | `namiashi_mpc_wbc.toml` + `--gait-controller champ` | +2.00 | +0.19 | +3.8° |
+| 4 | **MPC + WBC 位置出力** | `robots/namiashi_mpc_wbc.toml` | +2.14 | +0.17 | +2.6° |
+| 5 | MPC + WBC トルク出力（kd 0.3） | `namiashi_mpc_wbc.toml` + `--wbc-output torque` | +2.10 | +0.04 | +0.8° |
+
+walk 0.20 では前進はどれも指令の 9 割前後で差が出ず、**差が出るのは横ずれとヨー**
+（WBC を入れると 1/2〜1/4、トルク出力でほぼゼロ）。指令 0.20 × 11 s = 2.2 m。
+
+```sh
+./target/release/namiashi-run sim --robot robots/namiashi_mpc_wbc.toml --gait walk --vx 0.20 \
+    --secs 14 --video /tmp/nm4 --cam-fixed --cam-az 90 --cam-el -12 --cam-dist 2.4 --cam-x 1.05 --cam-z 0.15
+ffmpeg -framerate 30 -i /tmp/nm4/frame_%05d.png \
+    -vf "eq=brightness=0.28:contrast=1.5,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:expansion=none:text='4. MPC + WBC position output':fontsize=20:fontcolor=white:box=1:boxcolor=black@0.6:boxborderw=6:x=10:y=10" \
+    -c:v libx264 -pix_fmt yuv420p videos/modes_walk020_v4.mp4
+ffmpeg -i v1.mp4 -i v3.mp4 -i v4.mp4 -i v5.mp4 \
+    -filter_complex "[0:v][1:v]hstack[t];[2:v][3:v]hstack[b];[t][b]vstack[v]" -map "[v]" \
+    -c:v libx264 -pix_fmt yuv420p videos/modes_walk020_grid.mp4
+```
+
+drawtext の文字列に `:` や `%` は入れない（フィルタ構文と衝突する）。
+
 ## この機体の事実（制御の前提）
 
 ### モータ: LKMTech MG4005E-i10
