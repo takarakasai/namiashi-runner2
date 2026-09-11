@@ -1,0 +1,93 @@
+# namiashi-sim — namiashi/かわロボ に特化したシミュレーション側の資産。
+#
+# articara の namiashi-wbc ブランチから移設したもの: 起き上がり軌道、腕攻撃、
+# テレオペのキーバインド、WBC 試験ハーネス、競技リングの MJCF、そのテスト一式。
+# 汎用の下回り（mjcf の escape hatch、respawn 系、照明、StaircaseCfg など）は
+# articara main に残り、ここはそれを**使う**側。
+#
+# **ルートの package とは独立した単独 crate（Cargo.lock も自前）。**
+# MuJoCo の共有ライブラリ（MUJOCO_DYNAMIC_LINK_DIR）が要るので、SBC の
+# `git clone && cargo build` に一切触らせないため。PC では `cd sim` して
+# `cargo build` / `cargo test`。
+[package]
+name = "namiashi-sim"
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"
+authors = ["Takara Kasai <takara.kasai@gmail.com>"]
+publish = false
+description = "namiashi-specific simulation assets: self-righting, arm attack, teleop, the かわさきロボット競技大会 ring, and the WBC test harness."
+
+[features]
+default = ["mujoco"]
+# articara のフィーチャ名と同名にしてある（moved コードの #[cfg] を書き換えずに
+# 済ませるため）。
+mujoco = ["articara/mujoco"]
+mujoco-viewer = ["mujoco", "articara/mujoco-viewer", "dep:mujoco"]
+onnx = ["dep:ort", "dep:ndarray"]
+
+[dependencies]
+# articara / quadruped-gait は git 依存。URL の綴りは articara 側の
+# Cargo.toml と一字一句同じにすること — cargo は git ソースを URL 文字列で
+# 識別するので、違うと misarta の型が二重に生える。
+articara = { git = "https://github.com/takarakasai/articara.git" }
+quadruped-gait = { git = "https://github.com/takarakasai/quadruped-gait.git" }
+nalgebra = "0.34.2"
+log = "0.4"
+# バージョンは articara の pin と一致させる: 同一 crate インスタンスを共有しない
+# と MjViewer に渡す MjModel/MjData の型が合わない。
+mujoco = { package = "mujoco-rs", version = "4.0.1", optional = true }
+ort = { version = "2.0.0-rc.13", optional = true, default-features = false, features = ["load-dynamic", "ndarray", "std"] }
+ndarray = { version = "0.17.2", optional = true }
+
+[[example]]
+name = "namiashi_rl_teleop"
+required-features = ["mujoco-viewer", "onnx"]
+
+[[example]]
+name = "namiashi_wbc_teleop"
+required-features = ["mujoco-viewer"]
+
+[[example]]
+name = "kawasaki_ring_check"
+required-features = ["mujoco"]
+
+[[example]]
+name = "kawasaki_ring_bench"
+required-features = ["mujoco"]
+
+[[example]]
+name = "namiashi_attack_sweep"
+required-features = ["mujoco"]
+
+[[example]]
+name = "namiashi_attack_video"
+required-features = ["mujoco"]
+
+[[example]]
+name = "namiashi_cross_model_check"
+required-features = ["mujoco"]
+
+[[example]]
+name = "namiashi_opponent_check"
+required-features = ["mujoco"]
+
+[[example]]
+name = "namiashi_self_righting_check"
+required-features = ["mujoco"]
+
+[[example]]
+name = "namiashi_self_righting_probe"
+required-features = ["mujoco"]
+
+[[example]]
+name = "namiashi_self_righting_roll_sweep"
+required-features = ["mujoco"]
+
+[[example]]
+name = "namiashi_self_righting_search"
+required-features = ["mujoco"]
+
+[[example]]
+name = "namiashi_self_righting_video"
+required-features = ["mujoco"]

@@ -1,0 +1,600 @@
+<robot name="namiashi_description">
+  <link name="trunk">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 -0 0" />
+      <mass value="0" />
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0" />
+    </inertial>
+  </link>
+  <link name="trunk_interia">
+    <inertial>
+      <origin xyz="0.0018500000005587935 0.008369999937713146 0.008940000087022781" rpy="0 -0 0" />
+      <mass value="0.871762" />
+      <inertia ixx="0.0011107" ixy="-5.87675e-06" ixz="0.000287961" iyy="0.00503637" iyz="-5.87675e-06" izz="0.00528907" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 0" />
+      <geometry>
+        <mesh filename="/home/takara/work/dp/articara-namiashi/tests/fixtures/namiashi/meshes/trunk.stl" scale="1 1 1" />
+      </geometry>
+      <material name="">
+        <color rgba="0.8235294222831726 0.8235294222831726 0.8235294222831726 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.015643581748008728" rpy="0 -0 0" />
+      <geometry>
+        <box size="0.19874510169029236 0.12590473890304565 0.09287058562040329" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="arm">
+    <inertial>
+      <origin xyz="0.0831499993801117 -0.023360000923275948 0.0076500000432133675" rpy="0 -0 0" />
+      <mass value="0.0282378" />
+      <inertia ixx="1.17535e-05" ixy="-5.87675e-06" ixz="5.87675e-06" iyy="0.000199809" iyz="-0" izz="0.000199809" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0.02500000037252903 0" rpy="0 -0 0" />
+      <geometry>
+        <mesh filename="/home/takara/work/dp/articara-namiashi/tests/fixtures/namiashi/meshes/arm.stl" scale="1 1 1" />
+      </geometry>
+      <material name="">
+        <color rgba="0.4941176474094391 0.4941176474094391 0.4941176474094391 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.07999999821186066 -0.00139999995008111 0.03799999877810478" rpy="0 -0 0" />
+      <geometry>
+        <box size="0.06199999898672104 0.01600000075995922 0.024000000208616257" />
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="0.125 -0.00139999995008111 0.01899999938905239" rpy="0 0.7519999742507935 0" />
+      <geometry>
+        <box size="0.05849999934434891 0.01600000075995922 0.024000000208616257" />
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="0.20000000298023224 -0.00139999995008111 0.0020000000949949026" rpy="0 -0 0" />
+      <geometry>
+        <box size="0.10000000149011612 0.01600000075995922 0.019999999552965164" />
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="0.26499998569488525 -0.00139999995008111 0.01600000075995922" rpy="1.5707499980926514 -0 0" />
+      <geometry>
+        <cylinder radius="0.024000000208616257" length="0.01600000075995922" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="RL_hip">
+    <inertial>
+      <origin xyz="0.0021200000774115324 -0.0016899999463930726 0" rpy="0 -0 0" />
+      <mass value="0.469151" />
+      <inertia ixx="0.000110519" ixy="0" ixz="0" iyy="0.000165778" iyz="0" izz="0.000138148" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="3.141590118408203 -0 -3.1315951347351074" />
+      <geometry>
+        <mesh filename="/home/takara/work/dp/articara-namiashi/tests/fixtures/namiashi/meshes/hip.stl" scale="1 1 1" />
+      </geometry>
+      <material name="">
+        <color rgba="0.8117647171020508 0.6784313917160034 0.3019607961177826 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5707499980926514 -0 0" />
+      <geometry>
+        <cylinder radius="0.03400000184774399" length="0.03999999910593033" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="RL_thigh">
+    <inertial>
+      <origin xyz="0.00009999999747378752 -0.02501000091433525 -0.01358999963849783" rpy="0 -0 0" />
+      <mass value="0.057326" />
+      <inertia ixx="0.000884149" ixy="0" ixz="0" iyy="0.00082889" iyz="-0.000193408" izz="0.000221037" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 3.141590118408203" />
+      <geometry>
+        <mesh filename="/home/takara/work/dp/articara-namiashi/tests/fixtures/namiashi/meshes/thigh.stl" scale="1 1 1" />
+      </geometry>
+      <material name="">
+        <color rgba="0.4627451002597809 0.800000011920929 0.9921568632125854 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.07000000029802322" rpy="0 -0 0" />
+      <geometry>
+        <box size="0.09001903235912323 0.03500000014901161 0.24096406996250153" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="RL_calf">
+    <inertial>
+      <origin xyz="0 0.000029999999242136255 -0.04405999928712845" rpy="0 -0 0" />
+      <mass value="0.058934" />
+      <inertia ixx="0.000193408" ixy="0" ixz="0" iyy="0.000193408" iyz="0" izz="0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 0" />
+      <geometry>
+        <mesh filename="/home/takara/work/dp/articara-namiashi/tests/fixtures/namiashi/meshes/calf.stl" scale="1 1 1" />
+      </geometry>
+      <material name="">
+        <color rgba="0.4627451002597809 0.800000011920929 0.9921568632125854 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.07599999755620956" rpy="0 -0 0" />
+      <geometry>
+        <box size="0.01600000075995922 0.01600000075995922 0.15199999511241913" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="RL_foot">
+    <inertial>
+      <origin xyz="0 0 -0.005630000028759241" rpy="0 -0 0" />
+      <mass value="0.0145885" />
+      <inertia ixx="2.76297e-05" ixy="0" ixz="0" iyy="2.76297e-05" iyz="0" izz="2.76297e-05" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 0" />
+      <geometry>
+        <sphere radius="0.01600000075995922" />
+      </geometry>
+      <material name="">
+        <color rgba="0.4941176474094391 0.4941176474094391 0.4941176474094391 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 -0 0" />
+      <geometry>
+        <sphere radius="0.01600000075995922" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="FL_hip">
+    <inertial>
+      <origin xyz="-0.0021200000774115324 -0.0016899999463930726 0" rpy="0 -0 0" />
+      <mass value="0.469151" />
+      <inertia ixx="0.000110519" ixy="0" ixz="0" iyy="0.000165778" iyz="0" izz="0.000138148" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 0" />
+      <geometry>
+        <mesh filename="/home/takara/work/dp/articara-namiashi/tests/fixtures/namiashi/meshes/hip.stl" scale="1 1 1" />
+      </geometry>
+      <material name="">
+        <color rgba="0.8117647171020508 0.6784313917160034 0.3019607961177826 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5707499980926514 -0 0" />
+      <geometry>
+        <cylinder radius="0.03400000184774399" length="0.03999999910593033" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="FL_thigh">
+    <inertial>
+      <origin xyz="0.00009999999747378752 -0.02501000091433525 -0.01358999963849783" rpy="0 -0 0" />
+      <mass value="0.057326" />
+      <inertia ixx="0.000884149" ixy="0" ixz="0" iyy="0.00082889" iyz="-0.000193408" izz="0.000221037" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 3.141590118408203" />
+      <geometry>
+        <mesh filename="/home/takara/work/dp/articara-namiashi/tests/fixtures/namiashi/meshes/thigh.stl" scale="1 1 1" />
+      </geometry>
+      <material name="">
+        <color rgba="0.4627451002597809 0.800000011920929 0.9921568632125854 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.07000000029802322" rpy="0 -0 0" />
+      <geometry>
+        <box size="0.05999999865889549 0.03500000014901161 0.20000000298023224" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="FL_calf">
+    <inertial>
+      <origin xyz="0 0.000029999999242136255 -0.04405999928712845" rpy="0 -0 0" />
+      <mass value="0.058934" />
+      <inertia ixx="0.000193408" ixy="0" ixz="0" iyy="0.000193408" iyz="0" izz="0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 0" />
+      <geometry>
+        <mesh filename="/home/takara/work/dp/articara-namiashi/tests/fixtures/namiashi/meshes/calf.stl" scale="1 1 1" />
+      </geometry>
+      <material name="">
+        <color rgba="0.4627451002597809 0.800000011920929 0.9921568632125854 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.07599999755620956" rpy="0 -0 0" />
+      <geometry>
+        <box size="0.01600000075995922 0.01600000075995922 0.15199999511241913" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="FL_foot">
+    <inertial>
+      <origin xyz="0 0 -0.005630000028759241" rpy="0 -0 0" />
+      <mass value="0.0145885" />
+      <inertia ixx="2.76297e-05" ixy="0" ixz="0" iyy="2.76297e-05" iyz="0" izz="2.76297e-05" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 0" />
+      <geometry>
+        <sphere radius="0.01600000075995922" />
+      </geometry>
+      <material name="">
+        <color rgba="0.4941176474094391 0.4941176474094391 0.4941176474094391 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 -0 0" />
+      <geometry>
+        <sphere radius="0.01600000075995922" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="RR_hip">
+    <inertial>
+      <origin xyz="0.0021200000774115324 0.0016899999463930726 0" rpy="0 -0 0" />
+      <mass value="0.469151" />
+      <inertia ixx="0.000110519" ixy="0" ixz="0" iyy="0.000165778" iyz="0" izz="0.000138148" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 3.141590118408203" />
+      <geometry>
+        <mesh filename="/home/takara/work/dp/articara-namiashi/tests/fixtures/namiashi/meshes/hip.stl" scale="1 1 1" />
+      </geometry>
+      <material name="">
+        <color rgba="0.8117647171020508 0.6784313917160034 0.3019607961177826 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5707499980926514 -0 0" />
+      <geometry>
+        <cylinder radius="0.03400000184774399" length="0.03999999910593033" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="RR_thigh">
+    <inertial>
+      <origin xyz="-0.00009999999747378752 0.02501000091433525 -0.01358999963849783" rpy="0 -0 0" />
+      <mass value="0.057326" />
+      <inertia ixx="0.000884149" ixy="0" ixz="0" iyy="0.00082889" iyz="0.000193408" izz="0.000221037" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 0" />
+      <geometry>
+        <mesh filename="/home/takara/work/dp/articara-namiashi/tests/fixtures/namiashi/meshes/thigh.stl" scale="1 1 1" />
+      </geometry>
+      <material name="">
+        <color rgba="0.4627451002597809 0.800000011920929 0.9921568632125854 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.07000000029802322" rpy="0 -0 0" />
+      <geometry>
+        <box size="0.05999999865889549 0.03500000014901161 0.20000000298023224" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="RR_calf">
+    <inertial>
+      <origin xyz="0 -0.000029999999242136255 -0.04405999928712845" rpy="0 -0 0" />
+      <mass value="0.058934" />
+      <inertia ixx="0.000193408" ixy="0" ixz="0" iyy="0.000193408" iyz="0" izz="0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 0" />
+      <geometry>
+        <mesh filename="/home/takara/work/dp/articara-namiashi/tests/fixtures/namiashi/meshes/calf.stl" scale="1 1 1" />
+      </geometry>
+      <material name="">
+        <color rgba="0.4627451002597809 0.800000011920929 0.9921568632125854 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.07599999755620956" rpy="0 -0 0" />
+      <geometry>
+        <box size="0.01600000075995922 0.01600000075995922 0.15199999511241913" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="RR_foot">
+    <inertial>
+      <origin xyz="0 0 -0.005630000028759241" rpy="0 -0 0" />
+      <mass value="0.0145885" />
+      <inertia ixx="2.76297e-05" ixy="0" ixz="0" iyy="2.76297e-05" iyz="0" izz="2.76297e-05" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 0" />
+      <geometry>
+        <sphere radius="0.01600000075995922" />
+      </geometry>
+      <material name="">
+        <color rgba="0.4941176474094391 0.4941176474094391 0.4941176474094391 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 -0 0" />
+      <geometry>
+        <sphere radius="0.01600000075995922" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="FR_hip">
+    <inertial>
+      <origin xyz="-0.0021200000774115324 0.0016899999463930726 0" rpy="0 -0 0" />
+      <mass value="0.469151" />
+      <inertia ixx="0.000110519" ixy="0" ixz="0" iyy="0.000165778" iyz="0" izz="0.000138148" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="3.141590118408203 -0 0" />
+      <geometry>
+        <mesh filename="/home/takara/work/dp/articara-namiashi/tests/fixtures/namiashi/meshes/hip.stl" scale="1 1 1" />
+      </geometry>
+      <material name="">
+        <color rgba="0.8117647171020508 0.6784313917160034 0.3019607961177826 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5707499980926514 -0 0" />
+      <geometry>
+        <cylinder radius="0.03400000184774399" length="0.03999999910593033" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="FR_thigh">
+    <inertial>
+      <origin xyz="-0.00009999999747378752 0.02501000091433525 -0.01358999963849783" rpy="0 -0 0" />
+      <mass value="0.057326" />
+      <inertia ixx="0.000884149" ixy="0" ixz="0" iyy="0.00082889" iyz="0.000193408" izz="0.000221037" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 0" />
+      <geometry>
+        <mesh filename="/home/takara/work/dp/articara-namiashi/tests/fixtures/namiashi/meshes/thigh.stl" scale="1 1 1" />
+      </geometry>
+      <material name="">
+        <color rgba="0.4627451002597809 0.800000011920929 0.9921568632125854 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.07000000029802322" rpy="0 -0 0" />
+      <geometry>
+        <box size="0.05999999865889549 0.03500000014901161 0.20000000298023224" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="FR_calf">
+    <inertial>
+      <origin xyz="0 -0.000029999999242136255 -0.04405999928712845" rpy="0 -0 0" />
+      <mass value="0.058934" />
+      <inertia ixx="0.000193408" ixy="0" ixz="0" iyy="0.000193408" iyz="0" izz="0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 0" />
+      <geometry>
+        <mesh filename="/home/takara/work/dp/articara-namiashi/tests/fixtures/namiashi/meshes/calf.stl" scale="1 1 1" />
+      </geometry>
+      <material name="">
+        <color rgba="0.4627451002597809 0.800000011920929 0.9921568632125854 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.07599999755620956" rpy="0 -0 0" />
+      <geometry>
+        <box size="0.01600000075995922 0.01600000075995922 0.15199999511241913" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="FR_foot">
+    <inertial>
+      <origin xyz="0 0 -0.005630000028759241" rpy="0 -0 0" />
+      <mass value="0.0145885" />
+      <inertia ixx="2.76297e-05" ixy="0" ixz="0" iyy="2.76297e-05" iyz="0" izz="2.76297e-05" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 0" />
+      <geometry>
+        <sphere radius="0.01600000075995922" />
+      </geometry>
+      <material name="">
+        <color rgba="0.4941176474094391 0.4941176474094391 0.4941176474094391 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 -0 0" />
+      <geometry>
+        <sphere radius="0.01600000075995922" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="trunk_to_trunk_inertia" type="fixed">
+    <origin xyz="0 0 0" rpy="0 -0 0" />
+    <parent link="trunk" />
+    <child link="trunk_interia" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="0" effort="0" velocity="0" />
+  </joint>
+  <joint name="arm_pitch_joint" type="revolute">
+    <origin xyz="0.09700000286102295 0 0.06599999964237213" rpy="0 -0 0" />
+    <parent link="trunk" />
+    <child link="arm" />
+    <axis xyz="0 1 0" />
+    <limit lower="-2.3" upper="0.85" effort="6.865" velocity="8.727" />
+  </joint>
+  <joint name="RL_hip_joint" type="revolute">
+    <origin xyz="-0.1469999998807907 0.03440000116825104 0" rpy="0 -0 0" />
+    <parent link="trunk" />
+    <child link="RL_hip" />
+    <axis xyz="1 0 0" />
+    <limit lower="-0.785" upper="1.05" effort="2.5" velocity="33.5" />
+    <dynamics damping="0" friction="0" />
+  </joint>
+  <joint name="RL_thigh_joint" type="revolute">
+    <origin xyz="0 0.07473000138998032 0" rpy="0 -0 0" />
+    <parent link="RL_hip" />
+    <child link="RL_thigh" />
+    <axis xyz="0 1 0" />
+    <limit lower="-2.62" upper="2.62" effort="2.5" velocity="33.5" />
+    <dynamics damping="0" friction="0" />
+  </joint>
+  <joint name="RL_calf_joint" type="revolute">
+    <origin xyz="0 0 -0.15279999375343323" rpy="0 -0 0" />
+    <parent link="RL_thigh" />
+    <child link="RL_calf" />
+    <axis xyz="0 1 0" />
+    <limit lower="-2.62" upper="2.62" effort="3.88889" velocity="21.5357" />
+    <dynamics damping="0" friction="0" />
+  </joint>
+  <joint name="RL_foot_fixed" type="fixed">
+    <origin xyz="0 0 -0.15279999375343323" rpy="0 -0 0" />
+    <parent link="RL_calf" />
+    <child link="RL_foot" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="0" effort="2.5" velocity="0" />
+  </joint>
+  <joint name="FL_hip_joint" type="revolute">
+    <origin xyz="0.1469999998807907 0.03440000116825104 0" rpy="0 -0 0" />
+    <parent link="trunk" />
+    <child link="FL_hip" />
+    <axis xyz="1 0 0" />
+    <limit lower="-0.785" upper="1.05" effort="2.5" velocity="33.5" />
+    <dynamics damping="0" friction="0" />
+  </joint>
+  <joint name="FL_thigh_joint" type="revolute">
+    <origin xyz="0 0.07473000138998032 0" rpy="0 -0 0" />
+    <parent link="FL_hip" />
+    <child link="FL_thigh" />
+    <axis xyz="0 1 0" />
+    <limit lower="-2.62" upper="2.62" effort="2.5" velocity="33.5" />
+    <dynamics damping="0" friction="0" />
+  </joint>
+  <joint name="FL_calf_joint" type="revolute">
+    <origin xyz="0 0 -0.15279999375343323" rpy="0 -0 0" />
+    <parent link="FL_thigh" />
+    <child link="FL_calf" />
+    <axis xyz="0 1 0" />
+    <limit lower="-2.62" upper="2.62" effort="3.88889" velocity="21.5357" />
+    <dynamics damping="0" friction="0" />
+  </joint>
+  <joint name="FL_foot_fixed" type="fixed">
+    <origin xyz="0 0 -0.15279999375343323" rpy="0 -0 0" />
+    <parent link="FL_calf" />
+    <child link="FL_foot" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="0" effort="2.5" velocity="0" />
+  </joint>
+  <joint name="RR_hip_joint" type="revolute">
+    <origin xyz="-0.1469999998807907 -0.03440000116825104 0" rpy="0 -0 0" />
+    <parent link="trunk" />
+    <child link="RR_hip" />
+    <axis xyz="1 0 0" />
+    <limit lower="-1.05" upper="0.785" effort="2.5" velocity="33.5" />
+    <dynamics damping="0" friction="0" />
+  </joint>
+  <joint name="RR_thigh_joint" type="revolute">
+    <origin xyz="0 -0.07473000138998032 0" rpy="0 -0 0" />
+    <parent link="RR_hip" />
+    <child link="RR_thigh" />
+    <axis xyz="0 1 0" />
+    <limit lower="-2.62" upper="2.62" effort="2.5" velocity="33.5" />
+    <dynamics damping="0" friction="0" />
+  </joint>
+  <joint name="RR_calf_joint" type="revolute">
+    <origin xyz="0 0 -0.15279999375343323" rpy="0 -0 0" />
+    <parent link="RR_thigh" />
+    <child link="RR_calf" />
+    <axis xyz="0 1 0" />
+    <limit lower="-2.62" upper="2.62" effort="3.88889" velocity="21.5357" />
+    <dynamics damping="0" friction="0" />
+  </joint>
+  <joint name="RR_foot_fixed" type="fixed">
+    <origin xyz="0 0 -0.15279999375343323" rpy="0 -0 0" />
+    <parent link="RR_calf" />
+    <child link="RR_foot" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="0" effort="2.5" velocity="0" />
+  </joint>
+  <joint name="FR_hip_joint" type="revolute">
+    <origin xyz="0.1469999998807907 -0.03440000116825104 0" rpy="0 -0 0" />
+    <parent link="trunk" />
+    <child link="FR_hip" />
+    <axis xyz="1 0 0" />
+    <limit lower="-1.05" upper="0.785" effort="2.5" velocity="33.5" />
+    <dynamics damping="0" friction="0" />
+  </joint>
+  <joint name="FR_thigh_joint" type="revolute">
+    <origin xyz="0 -0.07473000138998032 0" rpy="0 -0 0" />
+    <parent link="FR_hip" />
+    <child link="FR_thigh" />
+    <axis xyz="0 1 0" />
+    <limit lower="-2.62" upper="2.62" effort="2.5" velocity="33.5" />
+    <dynamics damping="0" friction="0" />
+  </joint>
+  <joint name="FR_calf_joint" type="revolute">
+    <origin xyz="0 0 -0.15279999375343323" rpy="0 -0 0" />
+    <parent link="FR_thigh" />
+    <child link="FR_calf" />
+    <axis xyz="0 1 0" />
+    <limit lower="-2.62" upper="2.62" effort="3.88889" velocity="21.5357" />
+    <dynamics damping="0" friction="0" />
+  </joint>
+  <joint name="FR_foot_fixed" type="fixed">
+    <origin xyz="0 0 -0.15279999375343323" rpy="0 -0 0" />
+    <parent link="FR_calf" />
+    <child link="FR_foot" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="0" effort="2.5" velocity="0" />
+  </joint>
+  <material name="black">
+    <color rgba="0 0 0 1" />
+  </material>
+  <material name="blue">
+    <color rgba="0 0 0.8 1" />
+  </material>
+  <material name="green">
+    <color rgba="0 0.8 0 1" />
+  </material>
+  <material name="grey">
+    <color rgba="0.2 0.2 0.2 1" />
+  </material>
+  <material name="silver">
+    <color rgba="0.913725490196 0.913725490196 0.847058823529 1" />
+  </material>
+  <material name="orange">
+    <color rgba="1 0.423529411765 0.0392156862745 1" />
+  </material>
+  <material name="brown">
+    <color rgba="0.870588235294 0.811764705882 0.764705882353 1" />
+  </material>
+  <material name="white_gray">
+    <color rgba="0.823529411765 0.823529411765 0.823529411765 1" />
+  </material>
+  <material name="gold">
+    <color rgba="0.811764705882 0.678431372549 0.301960784314 1" />
+  </material>
+  <material name="white_blue">
+    <color rgba="0.462745098039 0.8 0.992156862745 1" />
+  </material>
+  <material name="white_black">
+    <color rgba="0.494117647059 0.494117647059 0.494117647059 1" />
+  </material>
+  <material name="red">
+    <color rgba="0.8 0 0 1" />
+  </material>
+  <material name="white">
+    <color rgba="1 1 1 1" />
+  </material>
+</robot>

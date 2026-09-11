@@ -1,0 +1,1901 @@
+schema = "misarta/1"
+
+[robot]
+name = "namiashi_description"
+root = "trunk"
+
+[[material]]
+name = "black"
+color = [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+]
+
+[[material]]
+name = "blue"
+color = [
+    0.0,
+    0.0,
+    0.800000011920929,
+    1.0,
+]
+
+[[material]]
+name = "brown"
+color = [
+    0.8705882430076599,
+    0.8117647171020508,
+    0.7647058963775635,
+    1.0,
+]
+
+[[material]]
+name = "gold"
+color = [
+    0.8117647171020508,
+    0.6784313917160034,
+    0.3019607961177826,
+    1.0,
+]
+
+[[material]]
+name = "green"
+color = [
+    0.0,
+    0.800000011920929,
+    0.0,
+    1.0,
+]
+
+[[material]]
+name = "grey"
+color = [
+    0.20000000298023224,
+    0.20000000298023224,
+    0.20000000298023224,
+    1.0,
+]
+
+[[material]]
+name = "orange"
+color = [
+    1.0,
+    0.42352941632270813,
+    0.03921568766236305,
+    1.0,
+]
+
+[[material]]
+name = "red"
+color = [
+    0.800000011920929,
+    0.0,
+    0.0,
+    1.0,
+]
+
+[[material]]
+name = "silver"
+color = [
+    0.9137254953384399,
+    0.9137254953384399,
+    0.8470588326454163,
+    1.0,
+]
+
+[[material]]
+name = "white"
+color = [
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+]
+
+[[material]]
+name = "white_black"
+color = [
+    0.4941176474094391,
+    0.4941176474094391,
+    0.4941176474094391,
+    1.0,
+]
+
+[[material]]
+name = "white_blue"
+color = [
+    0.4627451002597809,
+    0.800000011920929,
+    0.9921568632125854,
+    1.0,
+]
+
+[[material]]
+name = "white_gray"
+color = [
+    0.8235294222831726,
+    0.8235294222831726,
+    0.8235294222831726,
+    1.0,
+]
+
+[[link]]
+name = "trunk"
+
+[link.inertial]
+mass = 0.0
+ixx = 0.0
+iyy = 0.0
+izz = 0.0
+ixy = 0.0
+ixz = 0.0
+iyz = 0.0
+
+[[link]]
+name = "trunk_interia"
+
+[link.inertial]
+mass = 1.48341
+ixx = 0.00189
+iyy = 0.00857
+izz = 0.009
+ixy = -0.00001
+ixz = 0.00049
+iyz = -0.00001
+
+[link.inertial.origin]
+xyz = [
+    0.0018500000005587935,
+    0.008369999937713146,
+    0.008940000087022781,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[link.visual]]
+material = "white_gray"
+
+[link.visual.geom.mesh]
+file = "meshes/trunk.stl"
+
+[[link.collision]]
+
+[link.collision.origin]
+xyz = [
+    0.0,
+    0.0,
+    0.015643581748008728,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[link.collision.geom.box]
+size = [
+    0.19874510169029236,
+    0.12590473890304565,
+    0.09287058562040329,
+]
+
+[[link]]
+name = "arm"
+
+[link.inertial]
+mass = 0.04805
+ixx = 0.00002
+iyy = 0.00034
+izz = 0.00034
+ixy = -0.00001
+ixz = 0.00001
+iyz = -0.0
+
+[link.inertial.origin]
+xyz = [
+    0.0831499993801117,
+    -0.023360000923275948,
+    0.0076500000432133675,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[link.visual]]
+material = "white_black"
+
+[link.visual.origin]
+xyz = [
+    0.0,
+    0.02500000037252903,
+    0.0,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[link.visual.geom.mesh]
+file = "meshes/arm.stl"
+
+[[link.collision]]
+
+[link.collision.origin]
+xyz = [
+    0.07999999821186066,
+    -0.00139999995008111,
+    0.03799999877810478,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[link.collision.geom.box]
+size = [
+    0.06199999898672104,
+    0.01600000075995922,
+    0.024000000208616257,
+]
+
+[[link.collision]]
+
+[link.collision.origin]
+xyz = [
+    0.125,
+    -0.00139999995008111,
+    0.01899999938905239,
+]
+rpy = [
+    0.0,
+    0.7519999742507935,
+    0.0,
+]
+
+[link.collision.geom.box]
+size = [
+    0.05849999934434891,
+    0.01600000075995922,
+    0.024000000208616257,
+]
+
+[[link.collision]]
+
+[link.collision.origin]
+xyz = [
+    0.20000000298023224,
+    -0.00139999995008111,
+    0.0020000000949949026,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[link.collision.geom.box]
+size = [
+    0.10000000149011612,
+    0.01600000075995922,
+    0.019999999552965164,
+]
+
+[[link.collision]]
+
+[link.collision.origin]
+xyz = [
+    0.26499998569488525,
+    -0.00139999995008111,
+    0.01600000075995922,
+]
+rpy = [
+    1.5707499980926514,
+    -0.0,
+    0.0,
+]
+
+[link.collision.geom.cylinder]
+radius = 0.024000000208616257
+length = 0.01600000075995922
+
+[[link]]
+name = "RL_hip"
+
+[link.inertial]
+mass = 0.1698
+ixx = 0.00004
+iyy = 0.00006
+izz = 0.00005
+ixy = 0.0
+ixz = 0.0
+iyz = 0.0
+
+[link.inertial.origin]
+xyz = [
+    0.0021200000774115324,
+    -0.0016899999463930726,
+    0.0,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[link.visual]]
+material = "gold"
+
+[link.visual.origin]
+rpy = [
+    3.141590118408203,
+    -0.0,
+    -3.1315951347351074,
+]
+
+[link.visual.geom.mesh]
+file = "meshes/hip.stl"
+
+[[link.collision]]
+
+[link.collision.origin]
+rpy = [
+    1.5707499980926514,
+    -0.0,
+    0.0,
+]
+
+[link.collision.geom.cylinder]
+radius = 0.03400000184774399
+length = 0.03999999910593033
+
+[[link]]
+name = "RL_thigh"
+
+[link.inertial]
+mass = 0.020748
+ixx = 0.00032
+iyy = 0.0003
+izz = 0.00008
+ixy = 0.0
+ixz = 0.0
+iyz = -0.00007
+
+[link.inertial.origin]
+xyz = [
+    0.00009999999747378752,
+    -0.02501000091433525,
+    -0.01358999963849783,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[link.visual]]
+material = "white_blue"
+
+[link.visual.origin]
+rpy = [
+    0.0,
+    -0.0,
+    3.141590118408203,
+]
+
+[link.visual.geom.mesh]
+file = "meshes/thigh.stl"
+
+[[link.collision]]
+
+[link.collision.origin]
+xyz = [
+    0.0,
+    0.0,
+    -0.07000000029802322,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[link.collision.geom.box]
+size = [
+    0.09001903235912323,
+    0.03500000014901161,
+    0.24096406996250153,
+]
+
+[[link]]
+name = "RL_calf"
+
+[link.inertial]
+mass = 0.02133
+ixx = 0.00007
+iyy = 0.00007
+izz = 0.0
+ixy = 0.0
+ixz = 0.0
+iyz = 0.0
+
+[link.inertial.origin]
+xyz = [
+    0.0,
+    0.000029999999242136255,
+    -0.04405999928712845,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[link.visual]]
+material = "white_blue"
+
+[link.visual.geom.mesh]
+file = "meshes/calf.stl"
+
+[[link.collision]]
+
+[link.collision.origin]
+xyz = [
+    0.0,
+    0.0,
+    -0.07599999755620956,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[link.collision.geom.box]
+size = [
+    0.01600000075995922,
+    0.01600000075995922,
+    0.15199999511241913,
+]
+
+[[link]]
+name = "RL_foot"
+
+[link.inertial]
+mass = 0.00528
+ixx = 0.00001
+iyy = 0.00001
+izz = 0.00001
+ixy = 0.0
+ixz = 0.0
+iyz = 0.0
+
+[link.inertial.origin]
+xyz = [
+    0.0,
+    0.0,
+    -0.005630000028759241,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[link.visual]]
+material = "white_black"
+
+[link.visual.geom.sphere]
+radius = 0.01600000075995922
+
+[[link.collision]]
+
+[link.collision.geom.sphere]
+radius = 0.01600000075995922
+
+[[link]]
+name = "FL_hip"
+
+[link.inertial]
+mass = 0.1698
+ixx = 0.00004
+iyy = 0.00006
+izz = 0.00005
+ixy = 0.0
+ixz = 0.0
+iyz = 0.0
+
+[link.inertial.origin]
+xyz = [
+    -0.0021200000774115324,
+    -0.0016899999463930726,
+    0.0,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[link.visual]]
+material = "gold"
+
+[link.visual.geom.mesh]
+file = "meshes/hip.stl"
+
+[[link.collision]]
+
+[link.collision.origin]
+rpy = [
+    1.5707499980926514,
+    -0.0,
+    0.0,
+]
+
+[link.collision.geom.cylinder]
+radius = 0.03400000184774399
+length = 0.03999999910593033
+
+[[link]]
+name = "FL_thigh"
+
+[link.inertial]
+mass = 0.020748
+ixx = 0.00032
+iyy = 0.0003
+izz = 0.00008
+ixy = 0.0
+ixz = 0.0
+iyz = -0.00007
+
+[link.inertial.origin]
+xyz = [
+    0.00009999999747378752,
+    -0.02501000091433525,
+    -0.01358999963849783,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[link.visual]]
+material = "white_blue"
+
+[link.visual.origin]
+rpy = [
+    0.0,
+    -0.0,
+    3.141590118408203,
+]
+
+[link.visual.geom.mesh]
+file = "meshes/thigh.stl"
+
+[[link.collision]]
+
+[link.collision.origin]
+xyz = [
+    0.0,
+    0.0,
+    -0.07000000029802322,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[link.collision.geom.box]
+size = [
+    0.05999999865889549,
+    0.03500000014901161,
+    0.20000000298023224,
+]
+
+[[link]]
+name = "FL_calf"
+
+[link.inertial]
+mass = 0.02133
+ixx = 0.00007
+iyy = 0.00007
+izz = 0.0
+ixy = 0.0
+ixz = 0.0
+iyz = 0.0
+
+[link.inertial.origin]
+xyz = [
+    0.0,
+    0.000029999999242136255,
+    -0.04405999928712845,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[link.visual]]
+material = "white_blue"
+
+[link.visual.geom.mesh]
+file = "meshes/calf.stl"
+
+[[link.collision]]
+
+[link.collision.origin]
+xyz = [
+    0.0,
+    0.0,
+    -0.07599999755620956,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[link.collision.geom.box]
+size = [
+    0.01600000075995922,
+    0.01600000075995922,
+    0.15199999511241913,
+]
+
+[[link]]
+name = "FL_foot"
+
+[link.inertial]
+mass = 0.00528
+ixx = 0.00001
+iyy = 0.00001
+izz = 0.00001
+ixy = 0.0
+ixz = 0.0
+iyz = 0.0
+
+[link.inertial.origin]
+xyz = [
+    0.0,
+    0.0,
+    -0.005630000028759241,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[link.visual]]
+material = "white_black"
+
+[link.visual.geom.sphere]
+radius = 0.01600000075995922
+
+[[link.collision]]
+
+[link.collision.geom.sphere]
+radius = 0.01600000075995922
+
+[[link]]
+name = "RR_hip"
+
+[link.inertial]
+mass = 0.1698
+ixx = 0.00004
+iyy = 0.00006
+izz = 0.00005
+ixy = 0.0
+ixz = 0.0
+iyz = 0.0
+
+[link.inertial.origin]
+xyz = [
+    0.0021200000774115324,
+    0.0016899999463930726,
+    0.0,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[link.visual]]
+material = "gold"
+
+[link.visual.origin]
+rpy = [
+    0.0,
+    -0.0,
+    3.141590118408203,
+]
+
+[link.visual.geom.mesh]
+file = "meshes/hip.stl"
+
+[[link.collision]]
+
+[link.collision.origin]
+rpy = [
+    1.5707499980926514,
+    -0.0,
+    0.0,
+]
+
+[link.collision.geom.cylinder]
+radius = 0.03400000184774399
+length = 0.03999999910593033
+
+[[link]]
+name = "RR_thigh"
+
+[link.inertial]
+mass = 0.020748
+ixx = 0.00032
+iyy = 0.0003
+izz = 0.00008
+ixy = 0.0
+ixz = 0.0
+iyz = 0.00007
+
+[link.inertial.origin]
+xyz = [
+    -0.00009999999747378752,
+    0.02501000091433525,
+    -0.01358999963849783,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[link.visual]]
+material = "white_blue"
+
+[link.visual.geom.mesh]
+file = "meshes/thigh.stl"
+
+[[link.collision]]
+
+[link.collision.origin]
+xyz = [
+    0.0,
+    0.0,
+    -0.07000000029802322,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[link.collision.geom.box]
+size = [
+    0.05999999865889549,
+    0.03500000014901161,
+    0.20000000298023224,
+]
+
+[[link]]
+name = "RR_calf"
+
+[link.inertial]
+mass = 0.02133
+ixx = 0.00007
+iyy = 0.00007
+izz = 0.0
+ixy = 0.0
+ixz = 0.0
+iyz = 0.0
+
+[link.inertial.origin]
+xyz = [
+    0.0,
+    -0.000029999999242136255,
+    -0.04405999928712845,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[link.visual]]
+material = "white_blue"
+
+[link.visual.geom.mesh]
+file = "meshes/calf.stl"
+
+[[link.collision]]
+
+[link.collision.origin]
+xyz = [
+    0.0,
+    0.0,
+    -0.07599999755620956,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[link.collision.geom.box]
+size = [
+    0.01600000075995922,
+    0.01600000075995922,
+    0.15199999511241913,
+]
+
+[[link]]
+name = "RR_foot"
+
+[link.inertial]
+mass = 0.00528
+ixx = 0.00001
+iyy = 0.00001
+izz = 0.00001
+ixy = 0.0
+ixz = 0.0
+iyz = 0.0
+
+[link.inertial.origin]
+xyz = [
+    0.0,
+    0.0,
+    -0.005630000028759241,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[link.visual]]
+material = "white_black"
+
+[link.visual.geom.sphere]
+radius = 0.01600000075995922
+
+[[link.collision]]
+
+[link.collision.geom.sphere]
+radius = 0.01600000075995922
+
+[[link]]
+name = "FR_hip"
+
+[link.inertial]
+mass = 0.1698
+ixx = 0.00004
+iyy = 0.00006
+izz = 0.00005
+ixy = 0.0
+ixz = 0.0
+iyz = 0.0
+
+[link.inertial.origin]
+xyz = [
+    -0.0021200000774115324,
+    0.0016899999463930726,
+    0.0,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[link.visual]]
+material = "gold"
+
+[link.visual.origin]
+rpy = [
+    3.141590118408203,
+    -0.0,
+    0.0,
+]
+
+[link.visual.geom.mesh]
+file = "meshes/hip.stl"
+
+[[link.collision]]
+
+[link.collision.origin]
+rpy = [
+    1.5707499980926514,
+    -0.0,
+    0.0,
+]
+
+[link.collision.geom.cylinder]
+radius = 0.03400000184774399
+length = 0.03999999910593033
+
+[[link]]
+name = "FR_thigh"
+
+[link.inertial]
+mass = 0.020748
+ixx = 0.00032
+iyy = 0.0003
+izz = 0.00008
+ixy = 0.0
+ixz = 0.0
+iyz = 0.00007
+
+[link.inertial.origin]
+xyz = [
+    -0.00009999999747378752,
+    0.02501000091433525,
+    -0.01358999963849783,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[link.visual]]
+material = "white_blue"
+
+[link.visual.geom.mesh]
+file = "meshes/thigh.stl"
+
+[[link.collision]]
+
+[link.collision.origin]
+xyz = [
+    0.0,
+    0.0,
+    -0.07000000029802322,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[link.collision.geom.box]
+size = [
+    0.05999999865889549,
+    0.03500000014901161,
+    0.20000000298023224,
+]
+
+[[link]]
+name = "FR_calf"
+
+[link.inertial]
+mass = 0.02133
+ixx = 0.00007
+iyy = 0.00007
+izz = 0.0
+ixy = 0.0
+ixz = 0.0
+iyz = 0.0
+
+[link.inertial.origin]
+xyz = [
+    0.0,
+    -0.000029999999242136255,
+    -0.04405999928712845,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[link.visual]]
+material = "white_blue"
+
+[link.visual.geom.mesh]
+file = "meshes/calf.stl"
+
+[[link.collision]]
+
+[link.collision.origin]
+xyz = [
+    0.0,
+    0.0,
+    -0.07599999755620956,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[link.collision.geom.box]
+size = [
+    0.01600000075995922,
+    0.01600000075995922,
+    0.15199999511241913,
+]
+
+[[link]]
+name = "FR_foot"
+
+[link.inertial]
+mass = 0.00528
+ixx = 0.00001
+iyy = 0.00001
+izz = 0.00001
+ixy = 0.0
+ixz = 0.0
+iyz = 0.0
+
+[link.inertial.origin]
+xyz = [
+    0.0,
+    0.0,
+    -0.005630000028759241,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[link.visual]]
+material = "white_black"
+
+[link.visual.geom.sphere]
+radius = 0.01600000075995922
+
+[[link.collision]]
+
+[link.collision.geom.sphere]
+radius = 0.01600000075995922
+
+[[joint]]
+name = "trunk_to_trunk_inertia"
+type = "fixed"
+parent = "trunk"
+child = "trunk_interia"
+axis = [
+    1.0,
+    0.0,
+    0.0,
+]
+
+[[joint]]
+name = "arm_pitch_joint"
+type = "revolute"
+parent = "trunk"
+child = "arm"
+axis = [
+    0.0,
+    1.0,
+    0.0,
+]
+
+[joint.origin]
+xyz = [
+    0.09700000286102295,
+    0.0,
+    0.06599999964237213,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[joint.limit]
+lower = -2.3
+upper = 0.85
+effort = 6.865
+velocity = 8.727
+
+[joint.dynamics]
+armature = 0.0014
+damping = 0.1
+friction = 0.0
+
+[[joint]]
+name = "RL_hip_joint"
+type = "revolute"
+parent = "trunk"
+child = "RL_hip"
+axis = [
+    1.0,
+    0.0,
+    0.0,
+]
+
+[joint.origin]
+xyz = [
+    -0.1469999998807907,
+    0.03440000116825104,
+    0.0,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[joint.limit]
+lower = -0.785
+upper = 1.05
+effort = 1.5
+velocity = 33.5
+
+[joint.dynamics]
+armature = 0.0014
+damping = 0.1
+friction = 0.0
+
+[[joint]]
+name = "RL_thigh_joint"
+type = "revolute"
+parent = "RL_hip"
+child = "RL_thigh"
+axis = [
+    0.0,
+    1.0,
+    0.0,
+]
+
+[joint.origin]
+xyz = [
+    0.0,
+    0.07473000138998032,
+    0.0,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[joint.limit]
+lower = -2.62
+upper = 2.62
+effort = 1.5
+velocity = 33.5
+
+[joint.dynamics]
+armature = 0.0014
+damping = 0.1
+friction = 0.0
+
+[[joint]]
+name = "RL_calf_joint"
+type = "revolute"
+parent = "RL_thigh"
+child = "RL_calf"
+axis = [
+    0.0,
+    1.0,
+    0.0,
+]
+
+[joint.origin]
+xyz = [
+    0.0,
+    0.0,
+    -0.15279999375343323,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[joint.limit]
+lower = -2.62
+upper = 2.62
+effort = 2.205
+velocity = 33.5
+
+[joint.dynamics]
+armature = 0.0014
+damping = 0.1
+friction = 0.0
+
+[[joint]]
+name = "RL_foot_fixed"
+type = "fixed"
+parent = "RL_calf"
+child = "RL_foot"
+axis = [
+    1.0,
+    0.0,
+    0.0,
+]
+
+[joint.origin]
+xyz = [
+    0.0,
+    0.0,
+    -0.15279999375343323,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[joint]]
+name = "FL_hip_joint"
+type = "revolute"
+parent = "trunk"
+child = "FL_hip"
+axis = [
+    1.0,
+    0.0,
+    0.0,
+]
+
+[joint.origin]
+xyz = [
+    0.1469999998807907,
+    0.03440000116825104,
+    0.0,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[joint.limit]
+lower = -0.785
+upper = 1.05
+effort = 1.5
+velocity = 33.5
+
+[joint.dynamics]
+armature = 0.0014
+damping = 0.1
+friction = 0.0
+
+[[joint]]
+name = "FL_thigh_joint"
+type = "revolute"
+parent = "FL_hip"
+child = "FL_thigh"
+axis = [
+    0.0,
+    1.0,
+    0.0,
+]
+
+[joint.origin]
+xyz = [
+    0.0,
+    0.07473000138998032,
+    0.0,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[joint.limit]
+lower = -2.62
+upper = 2.62
+effort = 1.5
+velocity = 33.5
+
+[joint.dynamics]
+armature = 0.0014
+damping = 0.1
+friction = 0.0
+
+[[joint]]
+name = "FL_calf_joint"
+type = "revolute"
+parent = "FL_thigh"
+child = "FL_calf"
+axis = [
+    0.0,
+    1.0,
+    0.0,
+]
+
+[joint.origin]
+xyz = [
+    0.0,
+    0.0,
+    -0.15279999375343323,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[joint.limit]
+lower = -2.62
+upper = 2.62
+effort = 2.205
+velocity = 33.5
+
+[joint.dynamics]
+armature = 0.0014
+damping = 0.1
+friction = 0.0
+
+[[joint]]
+name = "FL_foot_fixed"
+type = "fixed"
+parent = "FL_calf"
+child = "FL_foot"
+axis = [
+    1.0,
+    0.0,
+    0.0,
+]
+
+[joint.origin]
+xyz = [
+    0.0,
+    0.0,
+    -0.15279999375343323,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[joint]]
+name = "RR_hip_joint"
+type = "revolute"
+parent = "trunk"
+child = "RR_hip"
+axis = [
+    1.0,
+    0.0,
+    0.0,
+]
+
+[joint.origin]
+xyz = [
+    -0.1469999998807907,
+    -0.03440000116825104,
+    0.0,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[joint.limit]
+lower = -1.05
+upper = 0.785
+effort = 1.5
+velocity = 33.5
+
+[joint.dynamics]
+armature = 0.0014
+damping = 0.1
+friction = 0.0
+
+[[joint]]
+name = "RR_thigh_joint"
+type = "revolute"
+parent = "RR_hip"
+child = "RR_thigh"
+axis = [
+    0.0,
+    1.0,
+    0.0,
+]
+
+[joint.origin]
+xyz = [
+    0.0,
+    -0.07473000138998032,
+    0.0,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[joint.limit]
+lower = -2.62
+upper = 2.62
+effort = 1.5
+velocity = 33.5
+
+[joint.dynamics]
+armature = 0.0014
+damping = 0.1
+friction = 0.0
+
+[[joint]]
+name = "RR_calf_joint"
+type = "revolute"
+parent = "RR_thigh"
+child = "RR_calf"
+axis = [
+    0.0,
+    1.0,
+    0.0,
+]
+
+[joint.origin]
+xyz = [
+    0.0,
+    0.0,
+    -0.15279999375343323,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[joint.limit]
+lower = -2.62
+upper = 2.62
+effort = 2.205
+velocity = 33.5
+
+[joint.dynamics]
+armature = 0.0014
+damping = 0.1
+friction = 0.0
+
+[[joint]]
+name = "RR_foot_fixed"
+type = "fixed"
+parent = "RR_calf"
+child = "RR_foot"
+axis = [
+    1.0,
+    0.0,
+    0.0,
+]
+
+[joint.origin]
+xyz = [
+    0.0,
+    0.0,
+    -0.15279999375343323,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[joint]]
+name = "FR_hip_joint"
+type = "revolute"
+parent = "trunk"
+child = "FR_hip"
+axis = [
+    1.0,
+    0.0,
+    0.0,
+]
+
+[joint.origin]
+xyz = [
+    0.1469999998807907,
+    -0.03440000116825104,
+    0.0,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[joint.limit]
+lower = -1.05
+upper = 0.785
+effort = 1.5
+velocity = 33.5
+
+[joint.dynamics]
+armature = 0.0014
+damping = 0.1
+friction = 0.0
+
+[[joint]]
+name = "FR_thigh_joint"
+type = "revolute"
+parent = "FR_hip"
+child = "FR_thigh"
+axis = [
+    0.0,
+    1.0,
+    0.0,
+]
+
+[joint.origin]
+xyz = [
+    0.0,
+    -0.07473000138998032,
+    0.0,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[joint.limit]
+lower = -2.62
+upper = 2.62
+effort = 1.5
+velocity = 33.5
+
+[joint.dynamics]
+armature = 0.0014
+damping = 0.1
+friction = 0.0
+
+[[joint]]
+name = "FR_calf_joint"
+type = "revolute"
+parent = "FR_thigh"
+child = "FR_calf"
+axis = [
+    0.0,
+    1.0,
+    0.0,
+]
+
+[joint.origin]
+xyz = [
+    0.0,
+    0.0,
+    -0.15279999375343323,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[joint.limit]
+lower = -2.62
+upper = 2.62
+effort = 2.205
+velocity = 33.5
+
+[joint.dynamics]
+armature = 0.0014
+damping = 0.1
+friction = 0.0
+
+[[joint]]
+name = "FR_foot_fixed"
+type = "fixed"
+parent = "FR_calf"
+child = "FR_foot"
+axis = [
+    1.0,
+    0.0,
+    0.0,
+]
+
+[joint.origin]
+xyz = [
+    0.0,
+    0.0,
+    -0.15279999375343323,
+]
+rpy = [
+    0.0,
+    -0.0,
+    0.0,
+]
+
+[[collision_pair]]
+link_a = "FL_hip"
+link_b = "RL_hip"
+enabled = false
+
+[[collision_pair]]
+link_a = "RL_hip"
+link_b = "RR_hip"
+enabled = false
+
+[[collision_pair]]
+link_a = "FR_hip"
+link_b = "RL_hip"
+enabled = false
+
+[[collision_pair]]
+link_a = "FL_hip"
+link_b = "RR_hip"
+enabled = false
+
+[[collision_pair]]
+link_a = "FL_hip"
+link_b = "FR_hip"
+enabled = false
+
+[[collision_pair]]
+link_a = "FR_hip"
+link_b = "RR_hip"
+enabled = false
+
+[[actuator]]
+name = "arm_pitch_joint_motor"
+mode = "Position"
+kp = 5.0
+kv = 0.5
+
+[[actuator.joints]]
+name = "arm_pitch_joint"
+gear = 1.0
+
+[[actuator]]
+name = "RL_hip_joint_motor"
+mode = "Position"
+kp = 20.0
+kv = 0.5
+
+[[actuator.joints]]
+name = "RL_hip_joint"
+gear = 1.0
+
+[[actuator]]
+name = "RL_thigh_joint_motor"
+mode = "Position"
+kp = 20.0
+kv = 0.5
+
+[[actuator.joints]]
+name = "RL_thigh_joint"
+gear = 1.0
+
+[[actuator]]
+name = "RL_calf_joint_motor"
+mode = "Position"
+kp = 20.0
+kv = 0.5
+
+[[actuator.joints]]
+name = "RL_calf_joint"
+gear = 1.0
+
+[[actuator]]
+name = "FL_hip_joint_motor"
+mode = "Position"
+kp = 20.0
+kv = 0.5
+
+[[actuator.joints]]
+name = "FL_hip_joint"
+gear = 1.0
+
+[[actuator]]
+name = "FL_thigh_joint_motor"
+mode = "Position"
+kp = 20.0
+kv = 0.5
+
+[[actuator.joints]]
+name = "FL_thigh_joint"
+gear = 1.0
+
+[[actuator]]
+name = "FL_calf_joint_motor"
+mode = "Position"
+kp = 20.0
+kv = 0.5
+
+[[actuator.joints]]
+name = "FL_calf_joint"
+gear = 1.0
+
+[[actuator]]
+name = "RR_hip_joint_motor"
+mode = "Position"
+kp = 20.0
+kv = 0.5
+
+[[actuator.joints]]
+name = "RR_hip_joint"
+gear = 1.0
+
+[[actuator]]
+name = "RR_thigh_joint_motor"
+mode = "Position"
+kp = 20.0
+kv = 0.5
+
+[[actuator.joints]]
+name = "RR_thigh_joint"
+gear = 1.0
+
+[[actuator]]
+name = "RR_calf_joint_motor"
+mode = "Position"
+kp = 20.0
+kv = 0.5
+
+[[actuator.joints]]
+name = "RR_calf_joint"
+gear = 1.0
+
+[[actuator]]
+name = "FR_hip_joint_motor"
+mode = "Position"
+kp = 20.0
+kv = 0.5
+
+[[actuator.joints]]
+name = "FR_hip_joint"
+gear = 1.0
+
+[[actuator]]
+name = "FR_thigh_joint_motor"
+mode = "Position"
+kp = 20.0
+kv = 0.5
+
+[[actuator.joints]]
+name = "FR_thigh_joint"
+gear = 1.0
+
+[[actuator]]
+name = "FR_calf_joint_motor"
+mode = "Position"
+kp = 20.0
+kv = 0.5
+
+[[actuator.joints]]
+name = "FR_calf_joint"
+gear = 1.0
+
+[[sensor]]
+name = "trunk_imu"
+link = "trunk"
+update_rate = 200.0
+origin = { xyz = [0.0, 0.0, 0.0] }
+kind = { imu = { gyro_noise = 0.0, accel_noise = 0.0 } }
+
+[[pose]]
+name = "extend_full"
+duration = 0.2
+kind = "QuinticSmooth"
+
+[pose.angles]
+FL_calf_joint = 0.0
+FL_hip_joint = 0.0
+FL_thigh_joint = 0.0
+FR_calf_joint = 0.0
+FR_hip_joint = 0.0
+FR_thigh_joint = 0.0
+RL_calf_joint = 0.0
+RL_hip_joint = 0.0
+RL_thigh_joint = 0.0
+RR_calf_joint = 0.0
+RR_hip_joint = 0.0
+RR_thigh_joint = 0.0
+arm_pitch_joint = 0.0
+
+[[pose]]
+name = "constrain"
+duration = 0.5
+kind = "QuinticSmooth"
+
+[pose.angles]
+FL_calf_joint = -1.9999999
+FL_hip_joint = 0.0
+FL_thigh_joint = 1.0000001
+FR_calf_joint = -1.9999999
+FR_hip_joint = 0.0
+FR_thigh_joint = 1.0000001
+RL_calf_joint = -1.9999999
+RL_hip_joint = 0.0
+RL_thigh_joint = 1.0000001
+RR_calf_joint = -1.9999999
+RR_hip_joint = 0.0
+RR_thigh_joint = 1.0000001
+arm_pitch_joint = 0.0
+
+[[pose]]
+name = "extend"
+duration = 1.0
+kind = "QuinticSmooth"
+
+[pose.angles]
+FL_calf_joint = -0.6000000000000001
+FL_hip_joint = 0.0
+FL_thigh_joint = 0.2999999999999998
+FR_calf_joint = -0.6000000000000001
+FR_hip_joint = 0.0
+FR_thigh_joint = 0.2999999999999998
+RL_calf_joint = -0.6000000000000001
+RL_hip_joint = 0.0
+RL_thigh_joint = 0.2999999999999998
+RR_calf_joint = -0.6000000000000001
+RR_hip_joint = 0.0
+RR_thigh_joint = 0.2999999999999998
+arm_pitch_joint = 0.0000000000000004440892098500626
+
+[[pose]]
+name = "constrain_2"
+duration = 0.1
+kind = "QuinticSmooth"
+
+[pose.angles]
+FL_calf_joint = -2.6
+FL_hip_joint = 0.0
+FL_thigh_joint = 1.2999999999999998
+FR_calf_joint = -2.6
+FR_hip_joint = 0.0
+FR_thigh_joint = 1.2999999999999998
+RL_calf_joint = -2.6
+RL_hip_joint = 0.0
+RL_thigh_joint = 1.2999999999999998
+RR_calf_joint = -2.5500000000000003
+RR_hip_joint = 0.0
+RR_thigh_joint = 1.2999999999999998
+arm_pitch_joint = 0.0000000000000004440892098500626
+
+[[sequence]]
+name = "jump"
+
+[[sequence.steps]]
+pose_name = "constrain_2"
+duration = 0.5
+kind = "QuinticSmooth"
+
+[[sequence.steps]]
+pose_name = "extend"
+duration = 0.4
+kind = "QuinticSmooth"
+
+[[sequence.steps]]
+pose_name = "constrain_2"
+duration = 0.1
+kind = "QuinticSmooth"
+
+[home]
+base_position = [
+    0.0,
+    0.0,
+    0.0,
+]
+base_orientation = [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+]
+
+[home.joint_positions]
+FL_calf_joint = 0.0
+FL_hip_joint = 0.0
+FL_thigh_joint = 0.0
+FR_calf_joint = 0.0
+FR_hip_joint = 0.0
+FR_thigh_joint = 0.0
+RL_calf_joint = 0.0
+RL_hip_joint = 0.0
+RL_thigh_joint = 0.0
+RR_calf_joint = 0.0
+RR_hip_joint = 0.0
+RR_thigh_joint = 0.0
+arm_pitch_joint = 0.0

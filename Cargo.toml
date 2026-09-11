@@ -8,6 +8,11 @@
 #   doc/ scripts/          この機体と SBC（radxa-cubie-a7z）の立ち上げ・運用手順
 #   src/main.rs            misa_runner を呼ぶだけ（シリアル直結の Plant は
 #                          misa-runner の組み込みなので Backend を差す必要が無い）
+#   sim/                   articara ベースのシミュレーション資産（起き上がり・
+#                          腕攻撃・テレオペ・競技リング・WBC 試験一式）。
+#                          **単独 crate**: MuJoCo が要るのでこの package の
+#                          ビルドには一切関与しない。`cd sim && cargo test`
+#   tools/                 sim の replay トレースを描く動画レンダラ（Python）
 #
 # **旧 namiashi-runner（github.com/takarakasai/namiashi-runner）は過去の大会の
 # 環境再現のために残してある。** 新しい変更はこちらと misa-runner に入れる。

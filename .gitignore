@@ -5,3 +5,8 @@
 /.cargo/config.toml
 # 動画は大きいので追跡しない（作り方は README「MuJoCo でリアルタイムに操縦する」）。
 /videos
+
+# sim/ の生成物（sim は単独 crate で Cargo.lock は追跡する。target は上の
+# **/target/ が既に無視している）
+sim/tests/fixtures/namiashi/usd/
+__pycache__/
