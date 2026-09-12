@@ -54,6 +54,29 @@ cd ../articara && cargo run --release --features viz -- \
 #    「Live gait feed」パネルでエンドポイント tcp/127.0.0.1:7447 を入れて Start
 ```
 
+### RL 方策（ONNX）で同じことをする
+
+学習済みの RL 方策（go2_rl の namiashi_rl、45 次元観測の PPO）を MuJoCo で
+回してキーボード操縦し、articara でも見る。物理・キー・地面は上の WBC デモと
+同じで、コントローラだけが方策に替わる（`sim/` は単独 crate なので `cd sim`）:
+
+```sh
+cd sim
+export MUJOCO_DYNAMIC_LINK_DIR=$HOME/.mujoco/mujoco-3.8.0/lib
+# ort は onnxruntime の共有ライブラリを実行時に読む（go2_rl の venv のを指す）
+export ORT_DYLIB_PATH=$HOME/work/install/isaac_5_1_0/env_isaaclab/lib/python3.11/site-packages/onnxruntime/capi/libonnxruntime.so.1.27.0
+cargo run --release --no-default-features \
+    --features mujoco,mujoco-viewer,onnx,viz --example namiashi_rl_teleop -- \
+    --onnx /path/to/namiashi_policy.onnx --viz --viz-endpoint tcp/127.0.0.1:7447
+# articara 側は上の 3) と同じ（Live feed を Connect / 同じエンドポイントで購読）
+```
+
+キー入力は **MjViewer のウィンドウ**が受ける（articara は第 2 の視点。
+地形・接触が描けるのは MjViewer 側だけ）。配信は planned（方策の q_des、
+ゴースト）と measured（実測）の対で、go2-runner の `policy --sim` と同じ
+ワイヤ契約（quadruped-gait の `VizPublisher`）。`--viz` を使うには feature
+`viz` が要る（付けずにビルドした場合は `--viz` 指定時にその旨を出して止まる）。
+
 `robots/namiashi_mpc_wbc.toml` は `robots/namiashi.toml`（配線・校正値は同じ）に
 articara が詰めた歩容の値（歩幅 0.145、周期 trot 0.320 / walk 0.500 / crawl
 0.800、遊脚 0.04）、`controller = "mpc"`、`[wbc] enabled = true`、

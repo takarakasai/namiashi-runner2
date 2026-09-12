@@ -39,6 +39,16 @@
 //! releasing it stops. O/L change the ground's friction, which is physics
 //! and so applies here exactly as it does to the WBC demo.
 //!
+//! `--viz` (build with `--features ...,viz`) additionally streams the pose to
+//! the articara GUI over Zenoh — planned (the policy's q_des, drawn as a
+//! ghost) and measured (MuJoCo's state) on quadruped-gait's default keys, the
+//! same contract go2-runner's `policy --sim` uses. Open the namiashi `.misa`
+//! in articara (`cargo run --release --features viz`), then in the
+//! "Live feed (Zenoh)" window pick topology=Connect with the publisher's
+//! `--viz-endpoint` (e.g. `tcp/127.0.0.1:7447`) and Subscribe. The MjViewer
+//! window stays the input surface — the keyboard drives THIS window; articara
+//! is a second, remote-capable view (terrain/contacts render only here).
+//!
 //! The gait, swing-height, body-height, levelling and controller-mu keys
 //! (1/2/3, R/F, =/-, B, P/.) do nothing here: a learned policy has no gait
 //! schedule to switch, no swing-height or stance-height parameter to set,
@@ -82,6 +92,17 @@ use namiashi_sim::ring::KawasakiRingCfg;
     // See WbcParams::render_hz -- lower this when the display, not the
     // physics, is what cannot keep up.
     let render_hz: f64 = get("--render-hz").and_then(|v| v.parse().ok()).unwrap_or(60.0);
+    let viz_on = args.iter().any(|a| a == "--viz");
+    let viz_endpoint = get("--viz-endpoint");
+    let viz_rate_hz: f64 = get("--viz-rate").and_then(|v| v.parse().ok()).unwrap_or(100.0);
+    #[cfg(not(feature = "viz"))]
+    if viz_on {
+        eprintln!(
+            "--viz needs the `viz` feature: cargo run --release --no-default-features \
+             --features mujoco,mujoco-viewer,onnx,viz --example namiashi_rl_teleop ..."
+        );
+        std::process::exit(2);
+    }
 
     // ── Constants (ported verbatim from sim2sim_namiashi_mujoco.py) ────────
     const ISAAC_NAMES: [&str; 12] = [
@@ -252,6 +273,37 @@ use namiashi_sim::ring::KawasakiRingCfg;
     eprintln!("[teleop] press K in the viewer for the controls list");
     eprintln!("[teleop] field = {field}  (--field ring | stairs, --cell-mm {cell_mm}, --render-hz {render_hz})");
 
+    // ── articara ライブ配信（--viz、feature "viz"）。quadruped-gait の
+    // VizPublisher が planned/measured の対・別スレッド送信・満杯時ドロップ
+    // を持つ。キーは既定（go2/gait/planned|measured — articara 側の既定と
+    // 同じ）。`--viz-endpoint` を与えるとそこで待ち受け、articara は
+    // topology=Connect で同じエンドポイントを差す。───────────────────────
+    #[cfg(feature = "viz")]
+    let mut viz_pub = if viz_on {
+        use quadruped_gait::viz_net::VizEndpoints;
+        use quadruped_gait::viz_pub::{VizPublisher, VizPublisherConfig};
+        let endpoints = match viz_endpoint.as_deref() {
+            Some(ep) => VizEndpoints::listen([ep]),
+            None => VizEndpoints::auto(),
+        };
+        let cfg = VizPublisherConfig {
+            rate_hz: viz_rate_hz,
+            dt,
+            endpoints,
+            ..VizPublisherConfig::default()
+        };
+        let p = VizPublisher::new(cfg).unwrap_or_else(|e| panic!("viz publisher: {e}"));
+        eprintln!(
+            "[teleop] viz: planned/measured を配信します（articara の Live feed、endpoint {}）",
+            viz_endpoint.as_deref().unwrap_or("マルチキャスト探索")
+        );
+        Some(p)
+    } else {
+        None
+    };
+    #[cfg(not(feature = "viz"))]
+    let _ = (viz_endpoint, viz_rate_hz);
+
     // ── Main loop: ONNX inference every `decim` physics ticks, held
     // between (matches sim2sim_namiashi_mujoco.py's own decimation). ───
     let mut last_action = [0.0f32; 12];
@@ -308,6 +360,44 @@ use namiashi_sim::ring::KawasakiRingCfg;
         }
         sim.step(&mut robot, dt, true);
         k += 1;
+
+        // planned（方策の q_des）と measured（MuJoCo の実測）を対で配信。
+        // フレームは毎周期組むが 12 関節の詰め替えだけで、送信の間引き・
+        // 別スレッド化・seq の対付けは VizPublisher の側にある。
+        #[cfg(feature = "viz")]
+        if let Some(p) = viz_pub.as_mut() {
+            use quadruped_gait::viz::{GaitVizFrame, VIZ_FORMAT_VERSION};
+            let tr = robot.base_transform.translation;
+            let (roll, pitch, yaw) = robot.base_transform.rotation.euler_angles();
+            let feet = ["FL_foot", "FR_foot", "RL_foot", "RR_foot"];
+            let fz = sim.contact_force_per_foot(&feet);
+            let stance = [fz[0] > 5.0, fz[1] > 5.0, fz[2] > 5.0, fz[3] > 5.0];
+            let mut planned_j = [0.0f64; 12];
+            let mut measured_j = [0.0f64; 12];
+            for l in 0..4 {
+                // slot 順 FL,FR,RL,RR × (hip, thigh, calf) ← Isaac 型順
+                for (jj, iso) in [l, 4 + l, 8 + l].into_iter().enumerate() {
+                    planned_j[3 * l + jj] = q_des_isaac[iso];
+                    let (q, _) = sim.joint_q_qd(ISAAC_NAMES[iso]).expect("joint state");
+                    measured_j[3 * l + jj] = q;
+                }
+            }
+            let planned = GaitVizFrame {
+                version: VIZ_FORMAT_VERSION,
+                seq: 0, // publisher が対で振り直す
+                t_s: k as f64 * dt,
+                pose: [tr.x, tr.y, tr.z, yaw],
+                pose_rp: [0.0, 0.0],
+                joints: planned_j,
+                stance,
+            };
+            let measured = GaitVizFrame {
+                pose_rp: [roll, pitch],
+                joints: measured_j,
+                ..planned.clone()
+            };
+            p.publish(|| (planned, Some(measured)));
+        }
 
         // ~60 Hz render/sync cadence, independent of the finer physics dt.
         let render_decim = ((1.0 / render_hz.max(1.0)) / dt).round().max(1.0) as u64;

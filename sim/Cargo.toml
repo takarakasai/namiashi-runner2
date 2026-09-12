@@ -25,6 +25,10 @@ default = ["mujoco"]
 mujoco = ["articara/mujoco"]
 mujoco-viewer = ["mujoco", "articara/mujoco-viewer", "dep:mujoco"]
 onnx = ["dep:ort", "dep:ndarray"]
+# articara の GUI へのライブ配信（Zenoh）。quadruped-gait の VizPublisher を
+# そのまま使う（planned/measured の対・別スレッド送信・満杯時ドロップは
+# あちらが持つ）。teleop の `--viz` で有効になる。
+viz = ["quadruped-gait/viz-pub"]
 
 [dependencies]
 # articara / quadruped-gait は git 依存。URL の綴りは articara 側の
