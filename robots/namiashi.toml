@@ -1,7 +1,7 @@
 name = "namiashi"
 
 [control]
-model = "models/namiashi/namiashi.misa"
+model = "models/namiashi/namiashi_meas.misa"
 rate_hz = 200.0
 transition_s = 1.5
 start_pose = "start"
