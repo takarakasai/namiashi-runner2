@@ -16,7 +16,7 @@
 //! **機体固有のものはリポジトリの側にある**: `robots/namiashi.toml`（配線・
 //! 校正値・トルク上限）、`models/namiashi`、`doc/`（立ち上げ・SBC の運用）。
 //! 制御の変更は misa-runner へ。この機体に Backend が要るようになったら
-//! （別のバスに替える、など）keel-runner の `KsmBridge` を手本に足す。
+//! （別のバスに替える、など）hayaashi-runner の `KsmBridge` を手本に足す。
 
 fn main() -> std::process::ExitCode {
     misa_runner::main_with(&[])
