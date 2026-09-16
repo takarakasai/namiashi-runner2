@@ -37,6 +37,20 @@ path = "src/main.rs"
 # ブランチは指定しない（既定ブランチ = main）。namiashi2027 は main に統合済みで、
 # push 先は main になっている（2026-09-10）。
 misa-runner = { git = "https://github.com/takarakasai/misa-runner.git" }
+# RL 方策の実行系（`policy` サブコマンド）。namiashi 契約（47 入力・位置目標
+# のみ）の観測組み立て・参照歩容・tract-onnx 推論はあちらが持つ。
+misa-policy-runner = { git = "https://github.com/takarakasai/misa-policy-runner.git" }
+# `policy` の WASD テレオペ（go2-runner と同じ）。
+crossterm = "0.27"
+log = "0.4"
+env_logger = "0.11"
+
+# `policy --sim` が MujocoPlant を直接組み立てるための直依存。misa-runner の
+# 同名 path 依存と同じ git ソースなので、同一インスタンスに解決される。
+[dependencies.misa-plant-mujoco]
+git = "https://github.com/takarakasai/misa-runner.git"
+package = "misa-plant-mujoco"
+optional = true
 
 [dev-dependencies]
 # tests/model_consistency.rs（.misa と URDF サイドカーの整合）が TOML を読む。
@@ -46,5 +60,5 @@ toml = "0.8"
 default = ["viz"]
 # misa-runner 側の feature をそのまま通す。
 viz = ["misa-runner/viz"]
-sim = ["misa-runner/sim"]
+sim = ["misa-runner/sim", "dep:misa-plant-mujoco"]
 render = ["misa-runner/render"]
