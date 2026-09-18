@@ -41,13 +41,20 @@ const RAMP_SECS: f64 = 2.0;
 const TILT_ABORT_RAD: f64 = 45.0_f64.to_radians();
 /// 観測欠損・推論失敗がこれだけ連続したら中断。
 const MAX_CONSECUTIVE_FAULTS: u32 = 10;
-/// 運用の既定 |wz| 上限。学習域は 0.4 だが、MuJoCo（このバイナリの --sim）で
-/// 純旋回は 0.2 でも転倒する。0.1 なら純旋回は回らないが転ばず、前進 0.15 +
-/// wz 0.1 は 94% 追従する（go2_rl doc/namiashi_policy_architecture.md §5）。
-const DEFAULT_WZ_MAX: f64 = 0.1;
+/// 運用の既定 |wz| 上限（契約世代ごと）。
+///
+/// v12〜v14 は MuJoCo で純旋回 0.2 でも転倒したので 0.1（回らないが転ばない）。
+/// v15（種較正）は純旋回 ±0.4 が両エンジンで 99–115%・転倒なしなので学習域
+/// いっぱいの 0.4（go2_rl doc/namiashi_policy_architecture.md §6）。
+const DEFAULT_WZ_MAX_V12: f64 = 0.1;
+const DEFAULT_WZ_MAX_V15: f64 = 0.4;
 
 pub(crate) struct Args {
     pub model: String,
+    /// 参照歩容の契約世代（--contract v12|v15。既定 v15 = デプロイ標準）。
+    /// ONNX は両世代とも 47 入力で自動判別できない — チェックポイントに
+    /// 合わせること（間違えると歩く。悪く。エラーは出ない）。
+    pub contract_v12: bool,
     pub robot: String,
     pub sim: bool,
     pub keyboard: bool,
@@ -78,11 +85,12 @@ fn usage() -> String {
 pub(crate) fn parse(args: &[String]) -> Result<Args, String> {
     let mut out = Args {
         model: String::new(),
+        contract_v12: false,
         robot: "robots/namiashi.toml".into(),
         sim: false,
         keyboard: false,
         cmd0: [0.0; 3],
-        wz_max: DEFAULT_WZ_MAX,
+        wz_max: f64::NAN, // 契約確定後に埋める
         vx_max: None,
         duration: None,
         hold: false,
@@ -112,6 +120,13 @@ pub(crate) fn parse(args: &[String]) -> Result<Args, String> {
             "--vy" => out.cmd0[1] = num(&mut it, "--vy")?,
             "--wz" => out.cmd0[2] = num(&mut it, "--wz")?,
             "--wz-max" => out.wz_max = num(&mut it, "--wz-max")?,
+            "--contract" => {
+                out.contract_v12 = match val(&mut it, "--contract")? {
+                    "v12" => true,
+                    "v15" => false,
+                    other => return Err(format!("--contract は v12 か v15 です（{other:?}）")),
+                }
+            }
             "--vx-max" => out.vx_max = Some(num(&mut it, "--vx-max")?),
             "--duration" => out.duration = Some(num(&mut it, "--duration")?),
             "--hold" => out.hold = true,
@@ -129,6 +144,9 @@ pub(crate) fn parse(args: &[String]) -> Result<Args, String> {
     }
     if out.model.is_empty() {
         return Err(format!("--model が要ります\n{}", usage()));
+    }
+    if out.wz_max.is_nan() {
+        out.wz_max = if out.contract_v12 { DEFAULT_WZ_MAX_V12 } else { DEFAULT_WZ_MAX_V15 };
     }
     Ok(out)
 }
@@ -241,11 +259,15 @@ pub(crate) fn write_leg_targets(cmd: &mut Command, q_isaac: &[f64; 12], kp: f64,
 }
 
 pub(crate) fn load_controller(a: &Args) -> Result<NamiashiRefController, String> {
+    use misa_policy_runner::namiashi::RefGaitCfg;
     let policy = OnnxPolicy::load(&a.model, misa_policy_runner::namiashi::N_OBS)?;
-    let ctl = NamiashiRefController::new(policy)?;
+    let gait = if a.contract_v12 { RefGaitCfg::v12() } else { RefGaitCfg::v15() };
+    let ctl = NamiashiRefController::new(policy, gait)?;
     eprintln!(
-        "policy: {} を読み込みました — namiashi 契約（47 入力、位置目標のみ、学習域 vx {:.2}..{:.2} / |vy| ≤ {:.2} / |wz| ≤ {:.2}）",
-        a.model, CMD_VX_RANGE.0, CMD_VX_RANGE.1, CMD_VY_RANGE.1, a.wz_max
+        "policy: {} を読み込みました — namiashi {} 契約（47 入力、位置目標のみ、学習域 vx {:.2}..{:.2} / |vy| ≤ {:.2} / |wz| ≤ {:.2}）",
+        a.model,
+        if a.contract_v12 { "v12" } else { "v15" },
+        CMD_VX_RANGE.0, CMD_VX_RANGE.1, CMD_VY_RANGE.1, a.wz_max
     );
     Ok(ctl)
 }
