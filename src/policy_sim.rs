@@ -178,7 +178,11 @@ pub(crate) fn run(a: &Args) -> Result<(), String> {
     ctl.reset();
     let mut held = ctl.hold();
     let start_xy = plant.base_position().map(|p| [p[0], p[1]]).unwrap_or([0.0; 2]);
-    let yaw0 = obs.imu.map(|i| i.rpy_rad[2]).unwrap_or(0.0);
+    // ヨーは毎周期積算する（アンラップ）。最終 rpy の差を ±π に折ると、
+    // 半回転を超えた旋回試行の符号が反転して見える（Python 側 sim2sim で
+    // 実際に起きた計測バグ。2026-09-19 修正）。
+    let mut yaw_prev = obs.imu.map(|i| i.rpy_rad[2]).unwrap_or(0.0);
+    let mut yaw_acc = 0.0f64;
     let mut fell: Option<String> = None;
     let mut tilt_max = 0.0f64;
     let mut z_min = f64::INFINITY;
@@ -216,6 +220,11 @@ pub(crate) fn run(a: &Args) -> Result<(), String> {
         hold_arm(&mut cmd);
         plant.exchange(&cmd, &mut obs)?;
         k += 1;
+        if let Some(imu) = obs.imu {
+            let d = imu.rpy_rad[2] - yaw_prev;
+            yaw_acc += d.sin().atan2(d.cos());
+            yaw_prev = imu.rpy_rad[2];
+        }
 
         if let Some(p) = publisher.as_mut() {
             let imu = obs.imu.unwrap_or_default();
@@ -262,8 +271,7 @@ pub(crate) fn run(a: &Args) -> Result<(), String> {
         let _ = h.join();
     }
     let base = plant.base_position().unwrap_or([0.0; 3]);
-    let yaw = obs.imu.map(|i| i.rpy_rad[2]).unwrap_or(0.0) - yaw0;
-    let yaw = yaw.sin().atan2(yaw.cos());
+    let yaw = yaw_acc;
     let el = (k as f64 * CONTROL_DT).max(1e-9);
     let d = [base[0] - start_xy[0], base[1] - start_xy[1]];
     eprintln!(
