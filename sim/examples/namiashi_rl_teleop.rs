@@ -144,7 +144,7 @@ use namiashi_sim::ring::KawasakiRingCfg;
     // ── Robot + staircase (same fixture/geometry every WBC/MPC test in
     // tests/wbc_walk.rs uses) ───────────────────────────────────────────
     let misa = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("tests/fixtures/namiashi/namiashi_3p3_prop.misa");
+        .join("tests/fixtures/namiashi/namiashi_meas.misa");
     let mut robot = RobotModel::from_misa(&misa).unwrap_or_else(|e| panic!(".misa load failed ({}): {e}", misa.display()));
     let stairs = StaircaseCfg { rise_m: 0.05, run_m: 0.20, n_steps: 10, approach_m: 1.5, top_platform_m: 8.0, half_width_m: 6.0 };
     let ring = KawasakiRingCfg { cell_m: cell_mm / 1000.0, ..Default::default() };

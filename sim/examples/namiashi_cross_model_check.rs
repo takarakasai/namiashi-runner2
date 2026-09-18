@@ -2,9 +2,14 @@
 //! robot?
 //!
 //! Everything so far was searched and measured on one model,
-//! `namiashi_3p3_prop`. The fixtures carry three others that differ in ways
+//! `namiashi_3p3_prop`. The fixtures carry four others that differ in ways
 //! this particular set of moves should care about:
 //!
+//!   * `namiashi_meas` -- the 現物合わせ (2026-09-13) model, and since then
+//!     the crate default: same 3.3 kg-class total, but the MEASURED motor
+//!     placement (a 150 g motor on the hip link AND one at the thigh's
+//!     proximal end). This is the row that predicts the real robot; the
+//!     others measure sensitivity around it.
 //!   * `namiashi_3p3_hip` -- same 3.30 kg, same joints, same actuators, but
 //!     the leg mass moved into the hip (thigh 0.021 kg against 0.057, calf
 //!     0.021 against 0.059). A recovery that works by throwing legs around
@@ -13,7 +18,7 @@
 //!     effort 1.5 N.m against 2.5, calf 2.205 against 3.889. Lighter helps,
 //!     less torque does not, and which wins is not obvious.
 //!
-//! Four fixtures, three models. `namiashi2` differs from `namiashi` only in
+//! Five fixtures, four models. `namiashi2` differs from `namiashi` only in
 //! its leg actuator gains (kp 20 / kv 0.5 against 100 / 1.2), and both this
 //! and the teleop put the leg joints in torque mode with a host-side PD, so
 //! those gains are never read. The two report identical numbers to three
@@ -41,7 +46,8 @@ fn main() {
     use std::sync::{Arc, Mutex};
 
     let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/namiashi");
-    let models: [(&str, &str); 4] = [
+    let models: [(&str, &str); 5] = [
+        ("meas (現物合わせ)", "namiashi_meas.misa"),
         ("3p3_prop (tuned on)", "namiashi_3p3_prop.misa"),
         ("3p3_hip", "namiashi_3p3_hip.misa"),
         ("namiashi (2.4 kg)", "namiashi.misa"),

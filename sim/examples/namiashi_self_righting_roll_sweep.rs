@@ -23,7 +23,7 @@ fn main() {
 
     let ring = KawasakiRingCfg::default();
     let misa = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("tests/fixtures/namiashi/namiashi_3p3_prop.misa");
+        .join("tests/fixtures/namiashi/namiashi_meas.misa");
     // The teleop's own drive law, so this measures what the `V` key does.
     let teleop = Drive::TorqueAhrs { kp: 100.0, kd: 1.2, tilt_tau_s: 0.15 };
     // Flat venue floor and the open ring surface, at the friction the search

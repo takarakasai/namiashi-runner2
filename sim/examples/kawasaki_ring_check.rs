@@ -72,7 +72,7 @@ use namiashi_sim::ring::KawasakiRingCfg;
     // Load it in MuJoCo: an hfield the exporter emits but MuJoCo rejects,
     // or a grid whose size disagrees with the asset, only shows up here.
     let misa = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("tests/fixtures/namiashi/namiashi_3p3_prop.misa");
+        .join("tests/fixtures/namiashi/namiashi_meas.misa");
     let robot = RobotModel::from_misa(&misa).expect("load namiashi");
     // Spawn on the red start platform, same as both teleop demos -- the
     // origin is the centre bowl.

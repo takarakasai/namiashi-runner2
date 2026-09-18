@@ -104,7 +104,7 @@ fn main() {
     let ring = KawasakiRingCfg::default();
     let (pw, pd) = ring.red_platform_m;
     let misa = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("tests/fixtures/namiashi/namiashi_3p3_prop.misa");
+        .join("tests/fixtures/namiashi/namiashi_meas.misa");
 
     // The flat venue floor is the honest baseline (nothing to slide off, no
     // edge to help); the open ring surface adds the plate seams and the 5 mm

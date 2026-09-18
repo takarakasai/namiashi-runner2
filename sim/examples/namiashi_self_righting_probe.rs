@@ -35,7 +35,7 @@ use namiashi_sim::ring::KawasakiRingCfg;
     let ring = KawasakiRingCfg::default();
     let (pw, pd) = ring.red_platform_m;
     let misa = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("tests/fixtures/namiashi/namiashi_3p3_prop.misa");
+        .join("tests/fixtures/namiashi/namiashi_meas.misa");
 
     // Flat, featureless, well clear of the ring: nothing to slide off, no
     // edge to help.

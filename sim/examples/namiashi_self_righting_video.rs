@@ -30,7 +30,7 @@ use namiashi_sim::ring::KawasakiRingCfg;
 
     let ring = KawasakiRingCfg::default();
     let misa = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("tests/fixtures/namiashi/namiashi_3p3_prop.misa");
+        .join("tests/fixtures/namiashi/namiashi_meas.misa");
     // On the open ring surface at the friction the search never trained on,
     // which is a condition both variants have to earn rather than one picked
     // for looking good.

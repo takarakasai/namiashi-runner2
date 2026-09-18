@@ -22,7 +22,7 @@ fn main() {
     let ring = KawasakiRingCfg::default();
     let (pw, pd) = ring.red_platform_m;
     let misa = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("tests/fixtures/namiashi/namiashi_3p3_prop.misa");
+        .join("tests/fixtures/namiashi/namiashi_meas.misa");
     let sites: [(&str, (f64, f64)); 5] = [
         ("flat venue floor", (1.60, 1.60)),
         ("open ring surface", (0.35, 0.35)),

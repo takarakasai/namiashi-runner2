@@ -27,7 +27,7 @@ use namiashi_sim::ring::KawasakiRingCfg;
     const SIM_S: f64 = 1.0;
 
     let misa = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("tests/fixtures/namiashi/namiashi_3p3_prop.misa");
+        .join("tests/fixtures/namiashi/namiashi_meas.misa");
 
     let stairs = StaircaseCfg {
         rise_m: 0.05,

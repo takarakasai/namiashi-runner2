@@ -22,7 +22,7 @@ use namiashi_sim::ring::{locked_robot_worldbody_xml, KawasakiRingCfg, LockedPose
     let ring = KawasakiRingCfg::default();
     let (pw, pd) = ring.red_platform_m;
     let misa = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("tests/fixtures/namiashi/namiashi_3p3_prop.misa");
+        .join("tests/fixtures/namiashi/namiashi_meas.misa");
     let mut robot = RobotModel::from_misa(&misa).expect("load namiashi");
 
     for pose in [LockedPose::default(), LockedPose { leg: [0.0, 0.9, -1.8], arm: 0.85 }] {
