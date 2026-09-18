@@ -51,10 +51,11 @@ const DEFAULT_WZ_MAX_V15: f64 = 0.4;
 
 pub(crate) struct Args {
     pub model: String,
-    /// 参照歩容の契約世代（--contract v12|v15。既定 v15 = デプロイ標準）。
-    /// ONNX は両世代とも 47 入力で自動判別できない — チェックポイントに
-    /// 合わせること（間違えると歩く。悪く。エラーは出ない）。
-    pub contract_v12: bool,
+    /// 参照歩容の契約世代（--contract v12|v15|v16。既定 v16 = デプロイ標準
+    /// = v16_sgfwd/policy_4598）。ONNX はどの世代も 47 入力で自動判別
+    /// できない — チェックポイントに合わせること（間違えると歩く。悪く。
+    /// エラーは出ない）。
+    pub contract: Contract,
     pub robot: String,
     pub sim: bool,
     pub keyboard: bool,
@@ -85,7 +86,7 @@ fn usage() -> String {
 pub(crate) fn parse(args: &[String]) -> Result<Args, String> {
     let mut out = Args {
         model: String::new(),
-        contract_v12: false,
+        contract: Contract::V16,
         robot: "robots/namiashi.toml".into(),
         sim: false,
         keyboard: false,
@@ -121,10 +122,11 @@ pub(crate) fn parse(args: &[String]) -> Result<Args, String> {
             "--wz" => out.cmd0[2] = num(&mut it, "--wz")?,
             "--wz-max" => out.wz_max = num(&mut it, "--wz-max")?,
             "--contract" => {
-                out.contract_v12 = match val(&mut it, "--contract")? {
-                    "v12" => true,
-                    "v15" => false,
-                    other => return Err(format!("--contract は v12 か v15 です（{other:?}）")),
+                out.contract = match val(&mut it, "--contract")? {
+                    "v12" => Contract::V12,
+                    "v15" => Contract::V15,
+                    "v16" => Contract::V16,
+                    other => return Err(format!("--contract は v12 / v15 / v16 です（{other:?}）")),
                 }
             }
             "--vx-max" => out.vx_max = Some(num(&mut it, "--vx-max")?),
@@ -146,7 +148,10 @@ pub(crate) fn parse(args: &[String]) -> Result<Args, String> {
         return Err(format!("--model が要ります\n{}", usage()));
     }
     if out.wz_max.is_nan() {
-        out.wz_max = if out.contract_v12 { DEFAULT_WZ_MAX_V12 } else { DEFAULT_WZ_MAX_V15 };
+        out.wz_max = match out.contract {
+            Contract::V12 => DEFAULT_WZ_MAX_V12,
+            Contract::V15 | Contract::V16 => DEFAULT_WZ_MAX_V15,
+        };
     }
     Ok(out)
 }
@@ -258,15 +263,37 @@ pub(crate) fn write_leg_targets(cmd: &mut Command, q_isaac: &[f64; 12], kp: f64,
     }
 }
 
+/// 参照歩容の契約世代。
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Contract {
+    V12,
+    V15,
+    V16,
+}
+
+impl Contract {
+    fn label(self) -> &'static str {
+        match self {
+            Contract::V12 => "v12",
+            Contract::V15 => "v15",
+            Contract::V16 => "v16",
+        }
+    }
+}
+
 pub(crate) fn load_controller(a: &Args) -> Result<NamiashiRefController, String> {
     use misa_policy_runner::namiashi::RefGaitCfg;
     let policy = OnnxPolicy::load(&a.model, misa_policy_runner::namiashi::N_OBS)?;
-    let gait = if a.contract_v12 { RefGaitCfg::v12() } else { RefGaitCfg::v15() };
+    let gait = match a.contract {
+        Contract::V12 => RefGaitCfg::v12(),
+        Contract::V15 => RefGaitCfg::v15(),
+        Contract::V16 => RefGaitCfg::v16(),
+    };
     let ctl = NamiashiRefController::new(policy, gait)?;
     eprintln!(
         "policy: {} を読み込みました — namiashi {} 契約（47 入力、位置目標のみ、学習域 vx {:.2}..{:.2} / |vy| ≤ {:.2} / |wz| ≤ {:.2}）",
         a.model,
-        if a.contract_v12 { "v12" } else { "v15" },
+        a.contract.label(),
         CMD_VX_RANGE.0, CMD_VX_RANGE.1, CMD_VY_RANGE.1, a.wz_max
     );
     Ok(ctl)
