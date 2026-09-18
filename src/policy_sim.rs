@@ -99,6 +99,8 @@ pub(crate) fn run(a: &Args) -> Result<(), String> {
             .map(|s| s.to_string())
             .collect(),
         root_link: "trunk".into(),
+        // 関節種別ごとのゲイン（hayaashi 向け）など、後から増えた項目は既定のまま。
+        ..SimOptions::default()
     };
     let mut plant = MujocoPlant::new(axes, &opts)?;
     let mut obs = Observation::empty(n, 4);
