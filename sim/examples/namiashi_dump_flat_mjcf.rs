@@ -7,9 +7,14 @@
 //! これで作る。
 //!
 //!   cargo run --release --example namiashi_dump_flat_mjcf -- \
-//!       [--misa PATH] [--out PATH]
+//!       [--misa PATH] [--out PATH] [--pose "NAME=RAD,..."] [--base-z M]
 //!
 //! 既定: ../models/namiashi/namiashi_meas.misa → /tmp/namiashi_flat/model.xml
+//!
+//! **機体非依存**: トルクアクチュエータは可動関節すべてに付ける。立位姿勢は
+//! `--pose` で与え、無指定のときは namiashi の既定姿勢を（その関節がある
+//! ときだけ）使う。プレイブックの段 2 を別機体で回すのに要る（ANYmal C は
+//! 関節名が `LF_HAA` 形式で、namiashi の名前が 1 つも無い）。
 
 use articara::mjcf::{GroundPlaneCfg, MjcfExportOptions};
 use articara::rbd::model::ActuatorMode;
@@ -43,18 +48,52 @@ fn main() {
             .into_owned()
     });
     let out = get("--out").unwrap_or_else(|| "/tmp/namiashi_flat/model.xml".into());
+    let base_z: f64 = get("--base-z").map(|v| v.parse().expect("--base-z")).unwrap_or(0.235);
 
     let mut robot = RobotModel::from_misa(std::path::Path::new(&misa))
         .unwrap_or_else(|e| panic!(".misa load failed ({misa}): {e}"));
-    for (name, q) in DEFAULT_ISAAC {
-        let Some(&ji) = robot.joint_map.get(name) else { panic!("joint missing: {name}") };
-        robot.joints[ji].actuator_mode = ActuatorMode::Torque;
-        robot.joint_positions[ji] = q;
+
+    // 可動関節はすべてトルク指令にする（名前を知らなくてよい）。
+    let mut actuated = 0usize;
+    for j in robot.joints.iter_mut() {
+        // 固定関節にはアクチュエータを付けない（joint_type で判別する）。
+        if j.joint_type != "fixed" {
+            j.actuator_mode = ActuatorMode::Torque;
+            actuated += 1;
+        }
+    }
+
+    // 立位姿勢。--pose が無ければ namiashi の既定を、**在る関節にだけ**当てる。
+    let mut posed = 0usize;
+    match get("--pose") {
+        Some(spec) => {
+            for item in spec.split(',').filter(|s| !s.trim().is_empty()) {
+                let (name, value) = item
+                    .split_once('=')
+                    .unwrap_or_else(|| panic!("--pose の項は NAME=RAD 形式: {item:?}"));
+                let name = name.trim();
+                let q: f64 = value.trim().parse().unwrap_or_else(|e| panic!("--pose {item:?}: {e}"));
+                let Some(&ji) = robot.joint_map.get(name) else {
+                    panic!("joint missing: {name}（--pose）")
+                };
+                robot.joint_positions[ji] = q;
+                posed += 1;
+            }
+        }
+        None => {
+            for (name, q) in DEFAULT_ISAAC {
+                if let Some(&ji) = robot.joint_map.get(name) {
+                    robot.joint_positions[ji] = q;
+                    posed += 1;
+                }
+            }
+            assert!(posed > 0, "既定姿勢の関節が 1 つも無い — --pose で与えること");
+        }
     }
     robot.rebuild_misarta_model();
 
     let opts = MjcfExportOptions {
-        base_pos: Some([0.0, 0.0, 0.235]),
+        base_pos: Some([0.0, 0.0, base_z]),
         ground_plane: Some(GroundPlaneCfg { z: 0.0, half_size: 20.0, roll: 0.0, pitch: 0.0 }),
         add_actuators: true,
         timestep: Some(0.005),
@@ -71,5 +110,8 @@ fn main() {
         std::fs::create_dir_all(dir).expect("create out dir");
     }
     std::fs::write(&out, &xml).expect("write model.xml");
-    eprintln!("[dump_flat_mjcf] {misa} -> {out} ({} bytes)", xml.len());
+    eprintln!(
+        "[dump_flat_mjcf] {misa} -> {out} ({} bytes, 可動 {actuated} 関節, 姿勢 {posed} 関節, base_z {base_z})",
+        xml.len()
+    );
 }
