@@ -71,3 +71,11 @@ doc/namiashi_policy_architecture.md §6（ヨー計測の ±π 巻き付き）�
   （`default_max_speed_rad_s`）を疑う。
 - 前進指令で横に流れる: 学習側と IMU の取り付け向きの不一致。`namiashi-run imu`
   で機体を前に傾けたとき pitch が + になるか。
+
+## 5. 実機比較の第 2 候補: v24（後退が要る運用向け）
+
+`--contract v24 --model .../2026-09-23_20-12-21_v24_long_s103/exported/policy_5500.onnx`。
+MuJoCo で前進 96–104% / **後退 109/103%**（v16 は 73%）/ 傾き 3–4°、kp 15/40・
+遅延 3 で転倒なし。複合（前進+旋回）のヨーは v16 より弱い（87% 対 102%）。
+標準は v16 のまま — 実機で後退が要るときにこちらを試す
+（go2_rl doc/namiashi_policy_architecture.md §15）。

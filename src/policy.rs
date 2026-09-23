@@ -51,7 +51,7 @@ const DEFAULT_WZ_MAX_V15: f64 = 0.4;
 
 pub(crate) struct Args {
     pub model: String,
-    /// 参照歩容の契約世代（--contract v12|v15|v16。既定 v16 = デプロイ標準
+    /// 参照歩容の契約世代（--contract v12|v15|v16|v24。既定 v16 = デプロイ標準
     /// = v16_sgfwd/policy_4598）。ONNX はどの世代も 47 入力で自動判別
     /// できない — チェックポイントに合わせること（間違えると歩く。悪く。
     /// エラーは出ない）。
@@ -126,7 +126,8 @@ pub(crate) fn parse(args: &[String]) -> Result<Args, String> {
                     "v12" => Contract::V12,
                     "v15" => Contract::V15,
                     "v16" => Contract::V16,
-                    other => return Err(format!("--contract は v12 / v15 / v16 です（{other:?}）")),
+                    "v24" => Contract::V24,
+                    other => return Err(format!("--contract は v12 / v15 / v16 / v24 です（{other:?}）")),
                 }
             }
             "--vx-max" => out.vx_max = Some(num(&mut it, "--vx-max")?),
@@ -150,7 +151,7 @@ pub(crate) fn parse(args: &[String]) -> Result<Args, String> {
     if out.wz_max.is_nan() {
         out.wz_max = match out.contract {
             Contract::V12 => DEFAULT_WZ_MAX_V12,
-            Contract::V15 | Contract::V16 => DEFAULT_WZ_MAX_V15,
+            Contract::V15 | Contract::V16 | Contract::V24 => DEFAULT_WZ_MAX_V15,
         };
     }
     Ok(out)
@@ -269,6 +270,9 @@ pub(crate) enum Contract {
     V12,
     V15,
     V16,
+    /// v24（後退の 3 段設計 + sg 1.25/0.78）。実機比較の第 2 候補 =
+    /// v24_long_s103/exported/policy_5500.onnx（go2_rl doc §15）。
+    V24,
 }
 
 impl Contract {
@@ -277,6 +281,7 @@ impl Contract {
             Contract::V12 => "v12",
             Contract::V15 => "v15",
             Contract::V16 => "v16",
+            Contract::V24 => "v24",
         }
     }
 }
@@ -288,6 +293,7 @@ pub(crate) fn load_controller(a: &Args) -> Result<NamiashiRefController, String>
         Contract::V12 => RefGaitCfg::v12(),
         Contract::V15 => RefGaitCfg::v15(),
         Contract::V16 => RefGaitCfg::v16(),
+        Contract::V24 => RefGaitCfg::v24(),
     };
     let ctl = NamiashiRefController::new(policy, gait)?;
     eprintln!(
