@@ -73,12 +73,14 @@ pub(crate) struct Args {
     pub kv: f64,
     pub friction: Option<f64>,
     pub delay_substeps: usize,
+    /// 毎 tick の指令・実測を CSV に落とす（実機のステップ応答・現物合わせ用）。
+    pub record: Option<String>,
 }
 
 fn usage() -> String {
     "usage: namiashi-run policy --model policy.onnx [--robot robots/namiashi.toml] [--sim]\n\
      \x20  [--keys] [--vx V] [--vy V] [--wz V] [--wz-max 0.2] [--vx-max V] [--duration S] [--hold]\n\
-     \x20  [--viz] [--viz-endpoint tcp/127.0.0.1:7447] [--viz-rate 100]\n\
+     \x20  [--viz] [--viz-endpoint tcp/127.0.0.1:7447] [--viz-rate 100] [--record out.csv]\n\
      \x20  sim だけ: [--misa PATH] [--kp 25] [--kv 0.5] [--friction 0.8] [--delay 0..4]"
         .into()
 }
@@ -103,6 +105,7 @@ pub(crate) fn parse(args: &[String]) -> Result<Args, String> {
         kv: 0.5,
         friction: None,
         delay_substeps: 0,
+        record: None,
     };
     let mut it = args.iter();
     fn val<'a>(it: &mut std::slice::Iter<'a, String>, key: &str) -> Result<&'a str, String> {
@@ -141,6 +144,7 @@ pub(crate) fn parse(args: &[String]) -> Result<Args, String> {
             "--kv" => out.kv = num(&mut it, "--kv")?,
             "--friction" => out.friction = Some(num(&mut it, "--friction")?),
             "--delay" => out.delay_substeps = num(&mut it, "--delay")? as usize,
+            "--record" => out.record = Some(val(&mut it, "--record")?.to_string()),
             "-h" | "--help" => return Err(usage()),
             other => return Err(format!("知らないオプション: {other}\n{}", usage())),
         }
@@ -155,6 +159,49 @@ pub(crate) fn parse(args: &[String]) -> Result<Args, String> {
         };
     }
     Ok(out)
+}
+
+/// `--record`: 1 tick 1 行の CSV。列は t, cmd(3), q_des(12, Isaac 型順),
+/// q(12), dq(12), rpy(3), gyro(3)。実機の内蔵位置ループの応答（指令 → 実測の
+/// 遅れ・追従幅）を後から当てはめるための生データ。書けなければ止めずに警告。
+pub(crate) struct Recorder {
+    w: std::io::BufWriter<std::fs::File>,
+    n: u64,
+}
+
+impl Recorder {
+    pub(crate) fn open(path: &str) -> Result<Self, String> {
+        let f = std::fs::File::create(path).map_err(|e| format!("--record {path}: {e}"))?;
+        let mut w = std::io::BufWriter::new(f);
+        let mut head = String::from("t,cmd_vx,cmd_vy,cmd_wz");
+        for (pre, n) in [("qdes", 12), ("q", 12), ("dq", 12)] {
+            for i in 0..n {
+                head.push_str(&format!(",{pre}{i}"));
+            }
+        }
+        head.push_str(",roll,pitch,yaw,gx,gy,gz\n");
+        w.write_all(head.as_bytes()).map_err(|e| e.to_string())?;
+        Ok(Self { w, n: 0 })
+    }
+
+    pub(crate) fn row(&mut self, t: f64, cmd: [f64; 3], q_des: &[f64; 12], inp: &NamiashiObsInput, rpy: [f64; 3]) {
+        let mut line = format!("{t:.3},{:.4},{:.4},{:.4}", cmd[0], cmd[1], cmd[2]);
+        for v in q_des.iter().chain(inp.joint_q_isaac.iter()).chain(inp.joint_dq_isaac.iter()) {
+            line.push_str(&format!(",{v:.5}"));
+        }
+        for v in rpy.iter().chain(inp.gyro_rad_s.iter()) {
+            line.push_str(&format!(",{v:.5}"));
+        }
+        line.push('\n');
+        if self.w.write_all(line.as_bytes()).is_ok() {
+            self.n += 1;
+        }
+    }
+
+    pub(crate) fn finish(mut self) -> u64 {
+        let _ = self.w.flush();
+        self.n
+    }
 }
 
 /// 指令のクランプ: 学習包絡 ∩ 運用上限。
@@ -394,6 +441,10 @@ pub(crate) fn run(args: &[String]) -> Result<(), String> {
     let mut status = Instant::now();
     let run_start = Instant::now();
     let mut abort: Option<String> = None;
+    let mut rec = match a.record.as_deref() {
+        Some(p) => Some(Recorder::open(p)?),
+        None => None,
+    };
     eprintln!(
         "policy: {}\r",
         if a.hold { "--hold — 方策は走らせず立位を保持して観測だけ表示します" } else { "RUNNING" }
@@ -434,6 +485,11 @@ pub(crate) fn run(args: &[String]) -> Result<(), String> {
                         }
                     }
                 }
+                if let Some(r) = rec.as_mut() {
+                    let rpy = obs.imu.map(|i| i.rpy_rad).unwrap_or([0.0; 3]);
+                    let q_des = if a.hold { default_isaac } else { held };
+                    r.row(run_start.elapsed().as_secs_f64(), cmd_now, &q_des, &inp, rpy);
+                }
             }
             Err(e) => {
                 faults += 1;
@@ -466,6 +522,10 @@ pub(crate) fn run(args: &[String]) -> Result<(), String> {
         }
     }
     quit.store(true, Ordering::Relaxed);
+    if let Some(r) = rec.take() {
+        let n = r.finish();
+        eprintln!("\r\npolicy: --record {} 行を書きました\r", n);
+    }
 
     // ── C: 終了。中断は即脱力、通常終了は立位へ戻してから脱力 ──
     if let Some(msg) = abort {

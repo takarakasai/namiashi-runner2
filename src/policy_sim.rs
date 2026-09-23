@@ -31,7 +31,7 @@ use misa_runner::viz;
 use misa_runner::AppConfig;
 
 use crate::policy::{
-    cmd_clamp, load_controller, obs_input, spawn_keyboard, write_leg_targets, Args, CONTROL_DT,
+    cmd_clamp, load_controller, obs_input, spawn_keyboard, write_leg_targets, Args, Recorder, CONTROL_DT,
 };
 
 /// 物理の刻み [s]（学習側 sim.dt と同じ）。
@@ -188,6 +188,10 @@ pub(crate) fn run(a: &Args) -> Result<(), String> {
     let mut z_min = f64::INFINITY;
     let mut status = Instant::now();
     let mut k: u64 = 0;
+    let mut rec = match a.record.as_deref() {
+        Some(p) => Some(Recorder::open(p)?),
+        None => None,
+    };
     eprintln!("policy-sim: RUNNING\r");
     while !quit.load(Ordering::Relaxed) {
         let t = k as f64 * CONTROL_DT;
@@ -213,6 +217,11 @@ pub(crate) fn run(a: &Args) -> Result<(), String> {
                     held = ctl.hold();
                 }
             }
+        }
+        if let Some(r) = rec.as_mut() {
+            let rpy = obs.imu.map(|i| i.rpy_rad).unwrap_or([0.0; 3]);
+            let q_des = if a.hold { DEFAULT_ISAAC } else { held };
+            r.row(t, cmd_now, &q_des, &inp, rpy);
         }
         ring.push_back(if a.hold { DEFAULT_ISAAC } else { held });
         let delayed = ring.pop_front().unwrap_or(DEFAULT_ISAAC);
@@ -267,6 +276,9 @@ pub(crate) fn run(a: &Args) -> Result<(), String> {
         }
     }
     quit.store(true, Ordering::Relaxed);
+    if let Some(r) = rec.take() {
+        eprintln!("\r\npolicy-sim: --record {} 行を書きました\r", r.finish());
+    }
     if let Some(h) = kb {
         let _ = h.join();
     }
