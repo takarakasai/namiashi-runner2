@@ -18,8 +18,8 @@ fi
 export MUJOCO_DYNAMIC_LINK_DIR="${MUJOCO_DYNAMIC_LINK_DIR:-$HOME/.mujoco/mujoco-3.8.0/lib}"
 # libmujoco は cargo run でも自動では載らない。
 export LD_LIBRARY_PATH="$MUJOCO_DYNAMIC_LINK_DIR${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-# 既定は v13 Adapt の MLP（go2_rl doc/namiashi_policy_architecture.md §5 のデプロイ候補）。
-DEFAULT_MODEL="$HOME/work/dp/go2_rl/logs/rsl_rl/namiashi_walk_flat_ref/2026-09-17_04-52-51_adapt_mlp_r/exported/policy_1500.onnx"
+# 既定は v24 s103@5500（デプロイ標準。go2_rl doc/namiashi_policy_architecture.md §18）。
+DEFAULT_MODEL="$HOME/work/dp/go2_rl/logs/rsl_rl/namiashi_walk_flat_ref/2026-09-23_20-12-21_v24_long_s103/exported/policy_5500.onnx"
 MODEL="${1:-${NAMIASHI_POLICY:-$DEFAULT_MODEL}}"
 [ $# -gt 0 ] && shift
 if [ ! -f "$MODEL" ]; then
@@ -30,4 +30,5 @@ if [ ! -f "$MODEL" ]; then
 fi
 VIZ_EP="${NAMIASHI_VIZ_ENDPOINT:-tcp/127.0.0.1:7447}"
 exec cargo run --release --features sim -- policy --sim --model "$MODEL" --keys \
+  --heading-hold 2 0.5 --heading-hold-turn \
   --viz --viz-endpoint "$VIZ_EP" "$@"

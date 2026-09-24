@@ -183,6 +183,12 @@ pub(crate) fn run(a: &Args) -> Result<(), String> {
     // 実際に起きた計測バグ。2026-09-19 修正）。
     let mut yaw_prev = obs.imu.map(|i| i.rpy_rad[2]).unwrap_or(0.0);
     let mut yaw_acc = 0.0f64;
+    // **体座標の道のり**。世界座標の dx/dy は旋回中に円弧を弦で測るので
+    // 過小評価になる（go2_rl doc §15: 複合の「前進 22–26%」は計測
+    // アーティファクトで実際は 88–90% だった）。毎周期の世界速度を機体の
+    // ヨーで回して積む。
+    let mut path_b = [0.0f64; 2];
+    let mut xy_prev = plant.base_position().map(|p| [p[0], p[1]]).unwrap_or([0.0; 2]);
     let mut fell: Option<String> = None;
     let mut tilt_max = 0.0f64;
     let mut z_min = f64::INFINITY;
@@ -192,7 +198,13 @@ pub(crate) fn run(a: &Args) -> Result<(), String> {
         Some(p) => Some(Recorder::open(p)?),
         None => None,
     };
-    let mut servo = a.heading_hold.map(|(kp, ki)| misa_policy_runner::heading::HeadingServo::new(kp, ki));
+    let mut servo = a.heading_hold.map(|(kp, ki)| {
+        let mut sv = misa_policy_runner::heading::HeadingServo::new(kp, ki);
+        if a.heading_hold_turn {
+            sv.straight_wz = 10.0;
+        }
+        sv
+    });
     eprintln!("policy-sim: RUNNING\r");
     while !quit.load(Ordering::Relaxed) {
         let t = k as f64 * CONTROL_DT;
@@ -210,6 +222,13 @@ pub(crate) fn run(a: &Args) -> Result<(), String> {
         tilt_max = tilt_max.max(tilt);
         let base = plant.base_position().unwrap_or([0.0, 0.0, BASE_HEIGHT_M]);
         z_min = z_min.min(base[2]);
+        {
+            let (dx, dy) = (base[0] - xy_prev[0], base[1] - xy_prev[1]);
+            xy_prev = [base[0], base[1]];
+            let (s_, c_) = obs.imu.map(|i| i.rpy_rad[2]).unwrap_or(0.0).sin_cos();
+            path_b[0] += dx * c_ + dy * s_;
+            path_b[1] += -dx * s_ + dy * c_;
+        }
         if base[2] < FALL_HEIGHT_M || tilt > FALL_TILT_RAD {
             fell = Some(format!("t={t:.1}s 高さ {:.2} m / 傾き {:.0}°", base[2], tilt.to_degrees()));
             break;
@@ -292,8 +311,8 @@ pub(crate) fn run(a: &Args) -> Result<(), String> {
     let el = (k as f64 * CONTROL_DT).max(1e-9);
     let d = [base[0] - start_xy[0], base[1] - start_xy[1]];
     eprintln!(
-        "\r\n[policy-sim namiashi] cmd=({:+.2},{:+.2},{:+.2})  dx={:+.2}m ({:+.3} m/s)  dy={:+.2}m  yaw={:+.2}rad ({:+.3} rad/s)  z_min={:.3}  tilt_max={:.1}deg  FELL={}",
-        a.cmd0[0], a.cmd0[1], a.cmd0[2], d[0], d[0] / el, d[1], yaw, yaw / el, z_min, tilt_max.to_degrees(),
+        "\r\n[policy-sim namiashi] cmd=({:+.2},{:+.2},{:+.2})  fwd={:+.3} m/s  lat={:+.3} m/s  yaw={:+.3} rad/s  (世界 dx={:+.2} dy={:+.2} yaw={:+.2}rad)  z_min={:.3}  tilt_max={:.1}deg  FELL={}",
+        a.cmd0[0], a.cmd0[1], a.cmd0[2], path_b[0] / el, path_b[1] / el, yaw / el, d[0], d[1], yaw, z_min, tilt_max.to_degrees(),
         fell.is_some()
     );
     if let Some(sv) = &servo {

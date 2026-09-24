@@ -51,8 +51,8 @@ const DEFAULT_WZ_MAX_V15: f64 = 0.4;
 
 pub(crate) struct Args {
     pub model: String,
-    /// 参照歩容の契約世代（--contract v12|v15|v16|v24。既定 v16 = デプロイ標準
-    /// = v16_sgfwd/policy_4598）。ONNX はどの世代も 47 入力で自動判別
+    /// 参照歩容の契約世代（--contract v12|v15|v16|v24。**既定 v24 = デプロイ標準
+    /// = v24_long_s103/policy_5500**、2026-09-25 に v16 から切り替え）。ONNX はどの世代も 47 入力で自動判別
     /// できない — チェックポイントに合わせること（間違えると歩く。悪く。
     /// エラーは出ない）。
     pub contract: Contract,
@@ -79,12 +79,16 @@ pub(crate) struct Args {
     /// ヨー偏り（v24 系で −0.04〜−0.08 rad/s、報酬では消えなかった）を IMU
     /// ヨーで閉じる。`--heading-hold KP KI`（Go2 実績 2 0.5）。
     pub heading_hold: Option<(f64, f64)>,
+    /// 方位サーボを旋回指令中も効かせる（`--heading-hold-turn`）。既定は直進
+    /// （|wz| < 0.05）だけ。旋回の過不足と複合指令のヨー偏りを直せるが、
+    /// 姿勢の代償があり得る。
+    pub heading_hold_turn: bool,
 }
 
 fn usage() -> String {
     "usage: namiashi-run policy --model policy.onnx [--robot robots/namiashi.toml] [--sim]\n\
      \x20  [--keys] [--vx V] [--vy V] [--wz V] [--wz-max 0.2] [--vx-max V] [--duration S] [--hold]\n\
-     \x20  [--viz] [--viz-endpoint tcp/127.0.0.1:7447] [--viz-rate 100] [--record out.csv] [--heading-hold 2 0.5]\n\
+     \x20  [--viz] [--viz-endpoint tcp/127.0.0.1:7447] [--viz-rate 100] [--record out.csv] [--heading-hold 2 0.5] [--heading-hold-turn]\n\
      \x20  sim だけ: [--misa PATH] [--kp 25] [--kv 0.5] [--friction 0.8] [--delay 0..4]"
         .into()
 }
@@ -92,7 +96,7 @@ fn usage() -> String {
 pub(crate) fn parse(args: &[String]) -> Result<Args, String> {
     let mut out = Args {
         model: String::new(),
-        contract: Contract::V16,
+        contract: Contract::V24,
         robot: "robots/namiashi.toml".into(),
         sim: false,
         keyboard: false,
@@ -111,6 +115,7 @@ pub(crate) fn parse(args: &[String]) -> Result<Args, String> {
         delay_substeps: 0,
         record: None,
         heading_hold: None,
+        heading_hold_turn: false,
     };
     let mut it = args.iter();
     fn val<'a>(it: &mut std::slice::Iter<'a, String>, key: &str) -> Result<&'a str, String> {
@@ -158,6 +163,7 @@ pub(crate) fn parse(args: &[String]) -> Result<Args, String> {
                 }
                 out.heading_hold = Some((kp, ki));
             }
+            "--heading-hold-turn" => out.heading_hold_turn = true,
             "-h" | "--help" => return Err(usage()),
             other => return Err(format!("知らないオプション: {other}\n{}", usage())),
         }
@@ -458,9 +464,16 @@ pub(crate) fn run(args: &[String]) -> Result<(), String> {
         Some(p) => Some(Recorder::open(p)?),
         None => None,
     };
-    let mut servo = a.heading_hold.map(|(kp, ki)| misa_policy_runner::heading::HeadingServo::new(kp, ki));
+    let mut servo = a.heading_hold.map(|(kp, ki)| {
+        let mut sv = misa_policy_runner::heading::HeadingServo::new(kp, ki);
+        if a.heading_hold_turn {
+            sv.straight_wz = 10.0; // 実質「常に補正」
+        }
+        sv
+    });
     if let Some(sv) = &servo {
-        eprintln!("policy: 方位保持 ON（KP {} KI {}、補正 ±{} rad/s、静止中は補正しない）\r", sv.kp, sv.ki, sv.clip);
+        eprintln!("policy: 方位保持 ON（KP {} KI {}、補正 ±{} rad/s、{}、静止中は補正しない）\r",
+            sv.kp, sv.ki, sv.clip, if a.heading_hold_turn { "旋回中も補正" } else { "直進のみ" });
     }
     eprintln!(
         "policy: {}\r",

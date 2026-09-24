@@ -2292,7 +2292,6 @@ dependencies = [
 [[package]]
 name = "misa-core"
 version = "0.1.0"
-source = "git+https://github.com/takarakasai/misa-runner.git#ffbb76ee4e2528422fadd4e0b5c802dc643d8bb8"
 dependencies = [
  "serde",
 ]
@@ -2300,7 +2299,6 @@ dependencies = [
 [[package]]
 name = "misa-hal"
 version = "0.1.0"
-source = "git+https://github.com/takarakasai/misa-runner.git#ffbb76ee4e2528422fadd4e0b5c802dc643d8bb8"
 dependencies = [
  "libc",
  "lkmotor-driver",
@@ -2318,7 +2316,6 @@ dependencies = [
 [[package]]
 name = "misa-plant-mujoco"
 version = "0.1.0"
-source = "git+https://github.com/takarakasai/misa-runner.git#ffbb76ee4e2528422fadd4e0b5c802dc643d8bb8"
 dependencies = [
  "articara",
  "log",
@@ -2329,8 +2326,7 @@ dependencies = [
 
 [[package]]
 name = "misa-policy-runner"
-version = "0.9.0"
-source = "git+https://github.com/takarakasai/misa-policy-runner.git#de1e0b996dd0c8b8b0717f3e0e1665e8aa780b64"
+version = "0.10.0"
 dependencies = [
  "nalgebra",
  "tract-onnx",
@@ -2339,7 +2335,6 @@ dependencies = [
 [[package]]
 name = "misa-runner"
 version = "0.1.0"
-source = "git+https://github.com/takarakasai/misa-runner.git#ffbb76ee4e2528422fadd4e0b5c802dc643d8bb8"
 dependencies = [
  "env_logger",
  "legged-estimation",
