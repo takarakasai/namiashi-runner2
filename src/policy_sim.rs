@@ -192,6 +192,7 @@ pub(crate) fn run(a: &Args) -> Result<(), String> {
         Some(p) => Some(Recorder::open(p)?),
         None => None,
     };
+    let mut servo = a.heading_hold.map(|(kp, ki)| misa_policy_runner::heading::HeadingServo::new(kp, ki));
     eprintln!("policy-sim: RUNNING\r");
     while !quit.load(Ordering::Relaxed) {
         let t = k as f64 * CONTROL_DT;
@@ -200,7 +201,11 @@ pub(crate) fn run(a: &Args) -> Result<(), String> {
                 break;
             }
         }
-        let cmd_now = *cmd_shared.lock().unwrap();
+        let cmd_user = *cmd_shared.lock().unwrap();
+        let cmd_now = match servo.as_mut() {
+            Some(sv) => sv.apply(obs.imu.map(|i| i.rpy_rad[2]).unwrap_or(0.0), cmd_user, CONTROL_DT),
+            None => cmd_user,
+        };
         let (inp, tilt) = obs_input(&obs)?;
         tilt_max = tilt_max.max(tilt);
         let base = plant.base_position().unwrap_or([0.0, 0.0, BASE_HEIGHT_M]);
@@ -291,6 +296,9 @@ pub(crate) fn run(a: &Args) -> Result<(), String> {
         a.cmd0[0], a.cmd0[1], a.cmd0[2], d[0], d[0] / el, d[1], yaw, yaw / el, z_min, tilt_max.to_degrees(),
         fell.is_some()
     );
+    if let Some(sv) = &servo {
+        eprintln!("policy-sim: 方位保持 KP {} KI {} — 平均 |補正| {:.3} rad/s", sv.kp, sv.ki, sv.mean_abs_corr());
+    }
     if let Some(f) = fell {
         eprintln!("policy-sim: 転倒 {f}");
     }

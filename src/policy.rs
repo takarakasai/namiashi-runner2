@@ -75,12 +75,16 @@ pub(crate) struct Args {
     pub delay_substeps: usize,
     /// 毎 tick の指令・実測を CSV に落とす（実機のステップ応答・現物合わせ用）。
     pub record: Option<String>,
+    /// PI 方位保持（misa-policy-runner `heading::HeadingServo`）。方策の前進時
+    /// ヨー偏り（v24 系で −0.04〜−0.08 rad/s、報酬では消えなかった）を IMU
+    /// ヨーで閉じる。`--heading-hold KP KI`（Go2 実績 2 0.5）。
+    pub heading_hold: Option<(f64, f64)>,
 }
 
 fn usage() -> String {
     "usage: namiashi-run policy --model policy.onnx [--robot robots/namiashi.toml] [--sim]\n\
      \x20  [--keys] [--vx V] [--vy V] [--wz V] [--wz-max 0.2] [--vx-max V] [--duration S] [--hold]\n\
-     \x20  [--viz] [--viz-endpoint tcp/127.0.0.1:7447] [--viz-rate 100] [--record out.csv]\n\
+     \x20  [--viz] [--viz-endpoint tcp/127.0.0.1:7447] [--viz-rate 100] [--record out.csv] [--heading-hold 2 0.5]\n\
      \x20  sim だけ: [--misa PATH] [--kp 25] [--kv 0.5] [--friction 0.8] [--delay 0..4]"
         .into()
 }
@@ -106,6 +110,7 @@ pub(crate) fn parse(args: &[String]) -> Result<Args, String> {
         friction: None,
         delay_substeps: 0,
         record: None,
+        heading_hold: None,
     };
     let mut it = args.iter();
     fn val<'a>(it: &mut std::slice::Iter<'a, String>, key: &str) -> Result<&'a str, String> {
@@ -145,6 +150,14 @@ pub(crate) fn parse(args: &[String]) -> Result<Args, String> {
             "--friction" => out.friction = Some(num(&mut it, "--friction")?),
             "--delay" => out.delay_substeps = num(&mut it, "--delay")? as usize,
             "--record" => out.record = Some(val(&mut it, "--record")?.to_string()),
+            "--heading-hold" => {
+                let kp = num(&mut it, "--heading-hold KP")?;
+                let ki = num(&mut it, "--heading-hold KI")?;
+                if !(kp > 0.0 && ki >= 0.0) {
+                    return Err(format!("--heading-hold は KP > 0, KI ≥ 0（{kp} {ki}）"));
+                }
+                out.heading_hold = Some((kp, ki));
+            }
             "-h" | "--help" => return Err(usage()),
             other => return Err(format!("知らないオプション: {other}\n{}", usage())),
         }
@@ -445,6 +458,10 @@ pub(crate) fn run(args: &[String]) -> Result<(), String> {
         Some(p) => Some(Recorder::open(p)?),
         None => None,
     };
+    let mut servo = a.heading_hold.map(|(kp, ki)| misa_policy_runner::heading::HeadingServo::new(kp, ki));
+    if let Some(sv) = &servo {
+        eprintln!("policy: 方位保持 ON（KP {} KI {}、補正 ±{} rad/s、静止中は補正しない）\r", sv.kp, sv.ki, sv.clip);
+    }
     eprintln!(
         "policy: {}\r",
         if a.hold { "--hold — 方策は走らせず立位を保持して観測だけ表示します" } else { "RUNNING" }
@@ -457,7 +474,11 @@ pub(crate) fn run(args: &[String]) -> Result<(), String> {
             }
         }
         plant.exchange(&cmd, &mut obs)?;
-        let cmd_now = *cmd_shared.lock().unwrap();
+        let cmd_user = *cmd_shared.lock().unwrap();
+        let cmd_now = match servo.as_mut() {
+            Some(sv) => sv.apply(obs.imu.map(|i| i.rpy_rad[2]).unwrap_or(0.0), cmd_user, CONTROL_DT),
+            None => cmd_user,
+        };
         let mut invalid = obs.any_unread();
         for i in 0..12 {
             if let Some(st) = obs.get(AxisId::new(i as u16)) {
