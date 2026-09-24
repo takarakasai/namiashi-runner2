@@ -8055,3 +8055,15 @@ dependencies = [
  "syn 3.0.5",
  "winnow 1.0.4",
 ]
+
+[[patch.unused]]
+name = "misa-plant-mujoco"
+version = "0.1.0"
+
+[[patch.unused]]
+name = "misa-runner"
+version = "0.1.0"
+
+[[patch.unused]]
+name = "misa-policy-runner"
+version = "0.7.0"
